@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Theory Visualizer - CalcHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/vis-network.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --secondary-dark: #6d28d9;
+            --accent: #10b981;
+            --accent-dark: #059669;
+            --text-light: #f8fafc;
+            --text-dark: #1e293b;
+            --background: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --nav-bg: rgba(30, 41, 59, 0.95);
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15);
+            --border-radius: 10px;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* Navigation styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* Graph Theory Content */
+        .graph-content {
+            padding: 7rem 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            height: calc(100vh - 9rem);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1.5rem;
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        /* Graph Controls */
+        .control-group {
+            margin-bottom: 1rem;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-dark);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Algorithm Selection */
+        .algorithm-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        /* Graph Container */
+        .graph-container {
+            flex: 1;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            position: relative;
+        }
+
+        #graph-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+
+        .results-panel.active {
+            display: block;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: var(--text-dark);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .graph-content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .graph-container {
+                height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="nav-links">
+                <a href="index.html" class="nav-link" data-page="home">Home</a>
+                <a href="calculator.html" class="nav-link" data-page="calculator">Basic Calculator</a>
+                <a href="scientific-calculator.html" class="nav-link" data-page="scientific">Scientific</a>
+                <a href="converter.html" class="nav-link" data-page="converter">Unit Converter</a>
+                <a href="morse-converter.html" class="nav-link" data-page="morse">Morse Code</a>
+                <a href="math-tables.html" class="nav-link" data-page="tables">Math Tables</a>
+                <a href="calculus.html" class="nav-link" data-page="calculus">Calculus</a>
+                <a href="graphing.html" class="nav-link" data-page="graphing">Graphing</a>
+                <a href="whiteboard.html" class="nav-link" data-page="whiteboard">Whiteboard</a>
+                <a href="graph-theory.html" class="nav-link active" data-page="graph">Graph Theory</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="graph-content">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h2 class="section-title">Graph Creation</h2>
+                <div class="control-group">
+                    <label for="node-input">Add Node:</label>
+                    <input type="text" id="node-input" class="input-field" placeholder="Node label">
+                    <button class="btn btn-primary" onclick="addNode()">
+                        <i class="fas fa-plus-circle"></i>
+                        Add Node
+                    </button>
+                </div>
+                <div class="control-group">
+                    <label>Add Edge:</label>
+                    <input type="text" id="edge-from" class="input-field" placeholder="From node">
+                    <input type="text" id="edge-to" class="input-field" placeholder="To node">
+                    <input type="number" id="edge-weight" class="input-field" placeholder="Weight (optional)">
+                    <button class="btn btn-primary" onclick="addEdge()">
+                        <i class="fas fa-link"></i>
+                        Add Edge
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h2 class="section-title">Algorithms</h2>
+                <div class="control-group">
+                    <label for="algorithm-select">Select Algorithm:</label>
+                    <select id="algorithm-select" class="algorithm-select">
+                        <option value="bfs">Breadth-First Search</option>
+                        <option value="dfs">Depth-First Search</option>
+                        <option value="dijkstra">Dijkstra's Shortest Path</option>
+                        <option value="mst">Minimum Spanning Tree</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="start-node">Start Node:</label>
+                    <input type="text" id="start-node" class="input-field" placeholder="Start node">
+                    <label for="end-node">End Node (for path finding):</label>
+                    <input type="text" id="end-node" class="input-field" placeholder="End node">
+                </div>
+                <button class="btn btn-secondary" onclick="runAlgorithm()">
+                    <i class="fas fa-play"></i>
+                    Run Algorithm
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <h2 class="section-title">Graph Properties</h2>
+                <button class="btn btn-accent" onclick="analyzeGraph()">
+                    <i class="fas fa-chart-bar"></i>
+                    Analyze Graph
+                </button>
+                <div id="graph-properties"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <h2 class="section-title">Sample Graphs</h2>
+                <button class="btn btn-primary" onclick="loadSampleGraph('tree')">Load Tree</button>
+                <button class="btn btn-primary" onclick="loadSampleGraph('complete')">Complete Graph</button>
+                <button class="btn btn-primary" onclick="loadSampleGraph('bipartite')">Bipartite Graph</button>
+            </div>
+        </div>
+
+        <div class="graph-container">
+            <div id="graph-canvas"></div>
+            <div class="results-panel" id="results-panel"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize vis.js network
+        const container = document.getElementById('graph-canvas');
+        const data = {
+            nodes: new vis.DataSet([]),
+            edges: new vis.DataSet([])
+        };
+        const options = {
+            nodes: {
+                shape: 'circle',
+                font: {
+                    size: 20
+                },
+                borderWidth: 2,
+                color: {
+                    background: '#ffffff',
+                    border: '#2563eb',
+                    highlight: {
+                        background: '#bfdbfe',
+                        border: '#2563eb'
+                    }
+                }
+            },
+            edges: {
+                arrows: {
+                    to: { enabled: true, scaleFactor: 1 }
+                },
+                color: '#64748b',
+                width: 2,
+                smooth: {
+                    type: 'continuous'
+                }
+            },
+            physics: {
+                solver: 'forceAtlas2Based',
+                forceAtlas2Based: {
+                    gravitationalConstant: -26,
+                    centralGravity: 0.005,
+                    springLength: 230,
+                    springConstant: 0.18
+                },
+                maxVelocity: 146,
+                minVelocity: 0.75,
+                timestep: 0.5
+            },
+            manipulation: {
+                enabled: true
+            }
+        };
+        const network = new vis.Network(container, data, options);
+
+        // Graph manipulation functions
+        function addNode() {
+            const label = document.getElementById('node-input').value.trim();
+            if (label) {
+                data.nodes.add({
+                    id: label,
+                    label: label
+                });
+                document.getElementById('node-input').value = '';
+            }
+        }
+
+        function addEdge() {
+            const from = document.getElementById('edge-from').value.trim();
+            const to = document.getElementById('edge-to').value.trim();
+            const weight = document.getElementById('edge-weight').value;
+            
+            if (from && to) {
+                data.edges.add({
+                    from: from,
+                    to: to,
+                    label: weight ? weight.toString() : '',
+                    weight: weight ? parseFloat(weight) : 1
+                });
+                
+                document.getElementById('edge-from').value = '';
+                document.getElementById('edge-to').value = '';
+                document.getElementById('edge-weight').value = '';
+            }
+        }
+
+        // Algorithm implementations
+        function runAlgorithm() {
+            const algorithm = document.getElementById('algorithm-select').value;
+            const startNode = document.getElementById('start-node').value.trim();
+            const endNode = document.getElementById('end-node').value.trim();
+            
+            switch(algorithm) {
+                case 'bfs':
+                    runBFS(startNode);
+                    break;
+                case 'dfs':
+                    runDFS(startNode);
+                    break;
+                case 'dijkstra':
+                    runDijkstra(startNode, endNode);
+                    break;
+                case 'mst':
+                    runPrim();
+                    break;
+            }
+        }
+
+        function runBFS(start) {
+            if (!start) return;
+            
+            const visited = new Set();
+            const queue = [start];
+            const result = [];
+            
+            while (queue.length > 0) {
+                const node = queue.shift();
+                if (!visited.has(node)) {
+                    visited.add(node);
+                    result.push(node);
+                    
+                    // Get connected nodes
+                    const edges = data.edges.get({
+                        filter: edge => edge.from === node || edge.to === node
+                    });
+                    
+                    for (const edge of edges) {
+                        const neighbor = edge.from === node ? edge.to : edge.from;
+                        if (!visited.has(neighbor)) {
+                            queue.push(neighbor);
+                        }
+                    }
+                }
+            }
+            
+            showResults('BFS Traversal: ' + result.join(' → '));
+            highlightPath(result);
+        }
+
+        function runDFS(start) {
+            if (!start) return;
+            
+            const visited = new Set();
+            const result = [];
+            
+            function dfs(node) {
+                visited.add(node);
+                result.push(node);
+                
+                const edges = data.edges.get({
+                    filter: edge => edge.from === node || edge.to === node
+                });
+                
+                for (const edge of edges) {
+                    const neighbor = edge.from === node ? edge.to : edge.from;
+                    if (!visited.has(neighbor)) {
+                        dfs(neighbor);
+                    }
+                }
+            }
+            
+            dfs(start);
+            showResults('DFS Traversal: ' + result.join(' → '));
+            highlightPath(result);
+        }
+
+        function runDijkstra(start, end) {
+            if (!start || !end) return;
+            
+            const distances = {};
+            const previous = {};
+            const unvisited = new Set();
+            
+            // Initialize distances
+            data.nodes.forEach(node => {
+                distances[node.id] = Infinity;
+                previous[node.id] = null;
+                unvisited.add(node.id);
+            });
+            distances[start] = 0;
+            
+            while (unvisited.size > 0) {
+                // Find node with minimum distance
+                let current = null;
+                let minDistance = Infinity;
+                for (const node of unvisited) {
+                    if (distances[node] < minDistance) {
+                        minDistance = distances[node];
+                        current = node;
+                    }
+                }
+                
+                if (current === null) break;
+                unvisited.delete(current);
+                
+                // Update distances to neighbors
+                const edges = data.edges.get({
+                    filter: edge => edge.from === current || edge.to === current
+                });
+                
+                for (const edge of edges) {
+                    const neighbor = edge.from === current ? edge.to : edge.from;
+                    const weight = edge.weight || 1;
+                    const distance = distances[current] + weight;
+                    
+                    if (distance < distances[neighbor]) {
+                        distances[neighbor] = distance;
+                        previous[neighbor] = current;
+                    }
+                }
+            }
+            
+            // Reconstruct path
+            const path = [];
+            let current = end;
+            while (current !== null) {
+                path.unshift(current);
+                current = previous[current];
+            }
+            
+            showResults(`Shortest Path (${start} → ${end}): ${path.join(' → ')}\nDistance: ${distances[end]}`);
+            highlightPath(path);
+        }
+
+        function runPrim() {
+            const visited = new Set();
+            const mst = [];
+            const startNode = data.nodes.get()[0].id;
+            visited.add(startNode);
+            
+            while (visited.size < data.nodes.length) {
+                let minEdge = null;
+                let minWeight = Infinity;
+                
+                // Find minimum weight edge connecting visited and unvisited nodes
+                data.edges.forEach(edge => {
+                    const isFromVisited = visited.has(edge.from);
+                    const isToVisited = visited.has(edge.to);
+                    
+                    if ((isFromVisited && !isToVisited) || (!isFromVisited && isToVisited)) {
+                        const weight = edge.weight || 1;
+                        if (weight < minWeight) {
+                            minWeight = weight;
+                            minEdge = edge;
+                        }
+                    }
+                });
+                
+                if (minEdge === null) break;
+                
+                mst.push(minEdge);
+                visited.add(minEdge.from);
+                visited.add(minEdge.to);
+            }
+            
+            showResults('Minimum Spanning Tree Edges: ' + 
+                mst.map(edge => `${edge.from} → ${edge.to} (${edge.weight || 1})`).join(', '));
+            highlightMST(mst);
+        }
+
+        // Utility functions
+        function showResults(text) {
+            const panel = document.getElementById('results-panel');
+            panel.textContent = text;
+            panel.classList.add('active');
+        }
+
+        function highlightPath(path) {
+            // Reset all nodes and edges
+            data.nodes.forEach(node => {
+                node.color = options.nodes.color;
+                data.nodes.update(node);
+            });
+            
+            data.edges.forEach(edge => {
+                edge.color = options.edges.color;
+                data.edges.update(edge);
+            });
+            
+            // Highlight path
+            for (let i = 0; i < path.length - 1; i++) {
+                const edge = data.edges.get({
+                    filter: edge => 
+                        (edge.from === path[i] && edge.to === path[i + 1]) ||
+                        (edge.from === path[i + 1] && edge.to === path[i])
+                })[0];
+                
+                if (edge) {
+                    edge.color = '#2563eb';
+                    data.edges.update(edge);
+                }
+            }
+            
+            // Highlight nodes
+            path.forEach(nodeId => {
+                const node = data.nodes.get(nodeId);
+                node.color = {
+                    background: '#bfdbfe',
+                    border: '#2563eb'
+                };
+                data.nodes.update(node);
+            });
+        }
+
+        function highlightMST(mstEdges) {
+            // Reset all edges
+            data.edges.forEach(edge => {
+                edge.color = options.edges.color;
+                data.edges.update(edge);
+            });
+            
+            // Highlight MST edges
+            mstEdges.forEach(edge => {
+                edge.color = '#2563eb';
+                data.edges.update(edge);
+            });
+        }
+
+        function analyzeGraph() {
+            const nodes = data.nodes.get();
+            const edges = data.edges.get();
+            
+            const properties = {
+                nodes: nodes.length,
+                edges: edges.length,
+                isConnected: checkConnectivity(),
+                hasCycle: checkCycles(),
+                degree: calculateDegrees()
+            };
+            
+            document.getElementById('graph-properties').innerHTML = `
+                <p>Nodes: ${properties.nodes}</p>
+                <p>Edges: ${properties.edges}</p>
+                <p>Connected: ${properties.isConnected}</p>
+                <p>Has Cycles: ${properties.hasCycle}</p>
+                <p>Max Degree: ${properties.degree.max}</p>
+                <p>Min Degree: ${properties.degree.min}</p>
+                <p>Average Degree: ${properties.degree.avg.toFixed(2)}</p>
+            `;
+        }
+
+        function checkConnectivity() {
+            const nodes = data.nodes.get();
+            if (nodes.length === 0) return true;
+            
+            const visited = new Set();
+            dfsVisit(nodes[0].id, visited);
+            
+            return visited.size === nodes.length;
+        }
+
+        function dfsVisit(node, visited) {
+            visited.add(node);
+            
+            const edges = data.edges.get({
+                filter: edge => edge.from === node || edge.to === node
+            });
+            
+            for (const edge of edges) {
+                const neighbor = edge.from === node ? edge.to : edge.from;
+                if (!visited.has(neighbor)) {
+                    dfsVisit(neighbor, visited);
+                }
+            }
+        }
+
+        function checkCycles() {
+            const nodes = data.nodes.get();
+            const visited = new Set();
+            const recursionStack = new Set();
+            
+            for (const node of nodes) {
+                if (!visited.has(node.id)) {
+                    if (hasCycleDFS(node.id, visited, recursionStack)) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        function hasCycleDFS(node, visited, recursionStack) {
+            visited.add(node);
+            recursionStack.add(node);
+            
+            const edges = data.edges.get({
+                filter: edge => edge.from === node
+            });
+            
+            for (const edge of edges) {
+                if (!visited.has(edge.to)) {
+                    if (hasCycleDFS(edge.to, visited, recursionStack)) {
+                        return true;
+                    }
+                } else if (recursionStack.has(edge.to)) {
+                    return true;
+                }
+            }
+            
+            recursionStack.delete(node);
+            return false;
+        }
+
+        function calculateDegrees() {
+            const degrees = {};
+            data.nodes.forEach(node => {
+                degrees[node.id] = 0;
+            });
+            
+            data.edges.forEach(edge => {
+                degrees[edge.from]++;
+                degrees[edge.to]++;
+            });
+            
+            const degreeValues = Object.values(degrees);
+            return {
+                max: Math.max(...degreeValues),
+                min: Math.min(...degreeValues),
+                avg: degreeValues.reduce((a, b) => a + b, 0) / degreeValues.length
+            };
+        }
+
+        // Sample graphs
+        function loadSampleGraph(type) {
+            data.nodes.clear();
+            data.edges.clear();
+            
+            switch(type) {
+                case 'tree':
+                    createSampleTree();
+                    break;
+                case 'complete':
+                    createCompleteGraph();
+                    break;
+                case 'bipartite':
+                    createBipartiteGraph();
+                    break;
+            }
+        }
+
+        function createSampleTree() {
+            const nodes = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+            const edges = [
+                {from: 'A', to: 'B'},
+                {from: 'A', to: 'C'},
+                {from: 'B', to: 'D'},
+                {from: 'B', to: 'E'},
+                {from: 'C', to: 'F'},
+                {from: 'C', to: 'G'}
+            ];
+            
+            nodes.forEach(node => {
+                data.nodes.add({id: node, label: node});
+            });
+            
+            edges.forEach(edge => {
+                data.edges.add(edge);
+            });
+        }
+
+        function createCompleteGraph() {
+            const nodes = ['A', 'B', 'C', 'D', 'E'];
+            nodes.forEach(node => {
+                data.nodes.add({id: node, label: node});
+            });
+            
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    data.edges.add({from: nodes[i], to: nodes[j]});
+                }
+            }
+        }
+
+        function createBipartiteGraph() {
+            const leftNodes = ['A', 'B', 'C'];
+            const rightNodes = ['X', 'Y', 'Z'];
+            
+            [...leftNodes, ...rightNodes].forEach(node => {
+                data.nodes.add({id: node, label: node});
+            });
+            
+            leftNodes.forEach(left => {
+                rightNodes.forEach(right => {
+                    data.edges.add({from: left, to: right});
+                });
+            });
+        }
+
+        // Initialize the network
+        network.on('click', function(params) {
+            if (params.nodes.length > 0) {
+                document.getElementById('start-node').value = params.nodes[0];
+            }
+        });
+
+        // Load a sample graph initially
+        loadSampleGraph('tree');
+    </script>
+</body>
+</html> 

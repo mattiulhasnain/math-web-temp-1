@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Geometry - CalcHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --text-light: #f8fafc;
+            --text-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(45deg, #0f172a, #1e1b4b);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.3);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .main-container {
+            margin-top: 80px;
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        .tools-panel {
+            width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .tool-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tool-group-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tool-btn:hover, .tool-btn.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+            transform: translateY(-2px);
+        }
+
+        .canvas-container {
+            flex: 1;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        #geometryCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .measurements-panel {
+            width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+        }
+
+        .measurement-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .measurement-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.25rem;
+        }
+
+        .measurement-value {
+            font-size: 1.1rem;
+            font-family: 'Monaco', monospace;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .tools-panel, .measurements-panel {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .canvas-container {
+                height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="tools-panel">
+            <div class="tool-group">
+                <h3 class="tool-group-title">Drawing Tools</h3>
+                <button class="tool-btn" data-tool="point">
+                    <i class="fas fa-dot-circle"></i>
+                    Point
+                </button>
+                <button class="tool-btn" data-tool="line">
+                    <i class="fas fa-minus"></i>
+                    Line
+                </button>
+                <button class="tool-btn" data-tool="circle">
+                    <i class="far fa-circle"></i>
+                    Circle
+                </button>
+                <button class="tool-btn" data-tool="polygon">
+                    <i class="fas fa-draw-polygon"></i>
+                    Polygon
+                </button>
+            </div>
+
+            <div class="tool-group">
+                <h3 class="tool-group-title">Measurement Tools</h3>
+                <button class="tool-btn" data-tool="distance">
+                    <i class="fas fa-ruler"></i>
+                    Distance
+                </button>
+                <button class="tool-btn" data-tool="angle">
+                    <i class="fas fa-angle-right"></i>
+                    Angle
+                </button>
+                <button class="tool-btn" data-tool="area">
+                    <i class="fas fa-vector-square"></i>
+                    Area
+                </button>
+            </div>
+
+            <div class="tool-group">
+                <h3 class="tool-group-title">Options</h3>
+                <button class="tool-btn" data-tool="grid">
+                    <i class="fas fa-border-all"></i>
+                    Toggle Grid
+                </button>
+                <button class="tool-btn" data-tool="clear">
+                    <i class="fas fa-trash-alt"></i>
+                    Clear All
+                </button>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="geometryCanvas"></canvas>
+            <div class="tooltip"></div>
+        </div>
+
+        <div class="measurements-panel">
+            <h3 class="tool-group-title">Measurements</h3>
+            <div id="measurementsList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup and state management
+        const canvas = document.getElementById('geometryCanvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.querySelector('.tooltip');
+        let currentTool = null;
+        let isDrawing = false;
+        let showGrid = true;
+        let shapes = [];
+        let measurements = [];
+        let currentShape = null;
+
+        // Resize canvas to fit container
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            drawAll();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Tool selection
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+
+                if (currentTool === 'grid') {
+                    showGrid = !showGrid;
+                    drawAll();
+                } else if (currentTool === 'clear') {
+                    shapes = [];
+                    measurements = [];
+                    updateMeasurements();
+                    drawAll();
+                }
+            });
+        });
+
+        // Mouse event handling
+        let startPoint = null;
+        let points = [];
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            tooltip.style.left = (e.clientX + 10) + 'px';
+            tooltip.style.top = (e.clientY + 10) + 'px';
+            tooltip.textContent = `(${Math.round(x)}, ${Math.round(y)})`;
+            tooltip.style.display = 'block';
+
+            if (isDrawing) {
+                drawAll();
+                drawPreview(x, y);
+            }
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            isDrawing = true;
+            
+            if (!startPoint) {
+                startPoint = { x, y };
+                points = [startPoint];
+            }
+
+            if (currentTool === 'point') {
+                shapes.push({ type: 'point', x, y });
+                isDrawing = false;
+            }
+
+            drawAll();
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (!isDrawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (currentTool === 'line') {
+                shapes.push({
+                    type: 'line',
+                    start: { ...startPoint },
+                    end: { x, y }
+                });
+                startPoint = null;
+                isDrawing = false;
+            } else if (currentTool === 'circle') {
+                const radius = Math.sqrt(
+                    Math.pow(x - startPoint.x, 2) + Math.pow(y - startPoint.y, 2)
+                );
+                shapes.push({
+                    type: 'circle',
+                    center: { ...startPoint },
+                    radius
+                });
+                startPoint = null;
+                isDrawing = false;
+            }
+
+            drawAll();
+        });
+
+        // Drawing functions
+        function drawGrid() {
+            if (!showGrid) return;
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+
+            // Draw vertical lines
+            for (let x = 0; x < canvas.width; x += 20) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            // Draw horizontal lines
+            for (let y = 0; y < canvas.height; y += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawPoint(x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#6366f1';
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawLine(start, end) {
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.strokeStyle = '#6366f1';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            drawPoint(start.x, start.y);
+            drawPoint(end.x, end.y);
+        }
+
+        function drawCircle(center, radius) {
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#6366f1';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            drawPoint(center.x, center.y);
+        }
+
+        function drawPreview(x, y) {
+            if (!startPoint) return;
+
+            if (currentTool === 'line') {
+                drawLine(startPoint, { x, y });
+            } else if (currentTool === 'circle') {
+                const radius = Math.sqrt(
+                    Math.pow(x - startPoint.x, 2) + Math.pow(y - startPoint.y, 2)
+                );
+                drawCircle(startPoint, radius);
+            }
+        }
+
+        function drawAll() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+
+            shapes.forEach(shape => {
+                if (shape.type === 'point') {
+                    drawPoint(shape.x, shape.y);
+                } else if (shape.type === 'line') {
+                    drawLine(shape.start, shape.end);
+                } else if (shape.type === 'circle') {
+                    drawCircle(shape.center, shape.radius);
+                }
+            });
+        }
+
+        function updateMeasurements() {
+            const measurementsList = document.getElementById('measurementsList');
+            measurementsList.innerHTML = measurements.map((m, i) => `
+                <div class="measurement-item">
+                    <div class="measurement-label">${m.label}</div>
+                    <div class="measurement-value">${m.value}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        drawAll();
+    </script>
+</body>
+</html> 

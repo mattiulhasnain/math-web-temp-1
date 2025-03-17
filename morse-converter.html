@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morse Code Converter - CalcHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --secondary-dark: #6d28d9;
+            --accent: #10b981;
+            --accent-dark: #059669;
+            --text-light: #f8fafc;
+            --text-dark: #1e293b;
+            --background: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --nav-bg: rgba(30, 41, 59, 0.95);
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15);
+            --border-radius: 10px;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --button-hover-scale: 1.05;
+            --transition-fast: 0.2s ease;
+            --transition-smooth: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --morse-color: #3b82f6;
+            --text-color: #8b5cf6;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Background visual elements */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.12) 0%, rgba(124, 58, 237, 0) 25%),
+                radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0) 30%);
+            z-index: -1;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 0.75rem 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: transform var(--transition-fast);
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary);
+            transition: transform var(--transition-fast);
+        }
+        
+        .logo:hover i {
+            transform: rotate(-15deg);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .nav-link.active {
+            background-color: rgba(37, 99, 235, 0.2);
+            color: var(--primary);
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+            left: 0;
+        }
+
+        /* Tool header */
+        .tool-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-light);
+            animation: fadeInDown 0.8s ease;
+            padding-top: 1rem;
+            position: relative;
+        }
+
+        .tool-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--text-light), var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .tool-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Calculator Styling */
+        .calculator-container {
+            width: 100%;
+            max-width: 100%;
+            padding: 7rem 20px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .converter-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg),
+                        0 0 40px rgba(124, 58, 237, 0.1),
+                        0 0 20px rgba(37, 99, 235, 0.15);
+            padding: 30px;
+            animation: fadeIn 0.6s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .converter-container:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg),
+                        0 20px 60px rgba(124, 58, 237, 0.15),
+                        0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+        
+        .converter-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent));
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            animation: gradientShift 8s linear infinite;
+            background-size: 200% 100%;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .converter-mode {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .mode-btn {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--text-dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .mode-btn i {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .mode-btn:hover i {
+            transform: scale(1.2);
+        }
+        
+        .mode-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .input-section, .output-section {
+            margin-bottom: 30px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+
+        .morse-input, .text-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            resize: vertical;
+            min-height: 120px;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .morse-input:focus, .text-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .convert-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .convert-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .convert-button:active {
+            transform: translateY(-2px);
+        }
+
+        .convert-button i {
+            margin-right: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .convert-button:hover i {
+            transform: rotate(180deg);
+        }
+
+        .result-container {
+            background-color: rgba(248, 250, 252, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            border-radius: 4px 0 0 4px;
+        }
+
+        .result-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            word-wrap: break-word;
+            min-height: 80px;
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .copy-btn:hover {
+            color: var(--secondary);
+            transform: scale(1.2);
+        }
+
+        .morse-reference {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .reference-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 15px;
+        }
+
+        .morse-char {
+            text-align: center;
+            padding: 8px;
+            background-color: rgba(248, 250, 252, 0.8);
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .morse-char:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            background-color: rgba(219, 234, 254, 0.8);
+        }
+
+        .char-symbol {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .char-code {
+            color: var(--text-dark);
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        /* Mobile Menu - Hidden by default */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+                filter: blur(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Add new float animation */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(0.5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Page transition overlay */
+        .page-transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--text-dark);
+            z-index: 2000;
+            transform: translateY(100%);
+            pointer-events: none;
+        }
+
+        .page-transition-overlay.active {
+            animation: pageTransition 0.6s ease-in-out;
+        }
+
+        @keyframes pageTransition {
+            0% { transform: translateY(100%); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Enhanced navbar */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            transform: scale(0);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-link:hover::before {
+            transform: scale(1);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(124, 58, 237, 0.2));
+            color: white;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--nav-bg);
+                flex-direction: column;
+                padding: 1rem 0;
+                gap: 0.5rem;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+
+            .nav-links.active {
+                display: flex;
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .converter-mode {
+                flex-direction: column;
+            }
+            
+            .reference-grid {
+                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calculator-container {
+                padding: 5rem 10px 10px;
+            }
+            
+            .converter-container {
+                padding: 20px;
+            }
+            
+            .tool-header h1 {
+                font-size: 2rem;
+            }
+            
+            .tool-header p {
+                font-size: 1rem;
+            }
+            
+            .morse-input, .text-input {
+                min-height: 100px;
+                font-size: 1rem;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="nav-links">
+                <a href="index.html" class="nav-link" data-page="home">Home</a>
+                <a href="calculator.html" class="nav-link" data-page="calculator">Basic Calculator</a>
+                <a href="scientific-calculator.html" class="nav-link" data-page="scientific">Scientific</a>
+                <a href="converter.html" class="nav-link" data-page="converter">Unit Converter</a>
+                <a href="morse-converter.html" class="nav-link" data-page="morse">Morse Code</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Transition Overlay -->
+    <div class="page-transition-overlay"></div>
+    
+    <div class="calculator-container">
+        <div class="tool-header">
+            <h1>Morse Code Converter</h1>
+            <p>Convert text to Morse code and vice versa</p>
+        </div>
+        
+        <div class="converter-container">
+            <div class="converter-mode">
+                <button class="mode-btn active" data-mode="text-to-morse">
+                    <i class="fas fa-font"></i>
+                    Text to Morse
+                </button>
+                <button class="mode-btn" data-mode="morse-to-text">
+                    <i class="fas fa-dot-circle"></i>
+                    Morse to Text
+                </button>
+            </div>
+            
+            <div class="input-section">
+                <label class="input-label" for="input-area">Enter Text:</label>
+                <textarea id="input-area" class="text-input" placeholder="Type here..."></textarea>
+            </div>
+            
+            <button class="convert-button" id="convert-btn">
+                <i class="fas fa-exchange-alt"></i> 
+                Convert
+            </button>
+            
+            <div class="result-container">
+                <div class="result-label">
+                    <i class="fas fa-dot-circle"></i> Result:
+                </div>
+                <div class="result-text" id="result-area"></div>
+                <button class="copy-btn" id="copy-btn" title="Copy to clipboard">
+                    <i class="far fa-copy"></i>
+                </button>
+            </div>
+            
+            <div class="morse-reference">
+                <div class="reference-title">Morse Code Reference</div>
+                <div class="reference-grid" id="reference-grid">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                });
+            }
+            
+            // Intelligent header - automatically detect current page
+            const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+            const navLinkElements = document.querySelectorAll('.nav-link');
+            
+            // Set active class based on current page
+            navLinkElements.forEach(link => {
+                const linkPage = link.getAttribute('data-page');
+                
+                // Special case for index.html (home page)
+                if ((currentPage === '' || currentPage === 'index') && linkPage === 'home') {
+                    link.classList.add('active');
+                } 
+                // For other pages
+                else if (currentPage === linkPage || 
+                         (currentPage === 'morse-converter' && linkPage === 'morse')) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Page transition effect for navigation
+            navLinkElements.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Skip if it's the current page
+                    if (this.classList.contains('active')) {
+                        return;
+                    }
+                    
+                    // Prevent default navigation
+                    e.preventDefault();
+                    
+                    // Get the href
+                    const targetPage = this.getAttribute('href');
+                    
+                    // Show page transition overlay
+                    const overlay = document.querySelector('.page-transition-overlay');
+                    overlay.classList.add('active');
+                    
+                    // Navigate to the new page after transition effect
+                    setTimeout(() => {
+                        window.location.href = targetPage;
+                    }, 300);
+                });
+            });
+            
+            // Add floating animation to container
+            const container = document.querySelector('.converter-container');
+            setTimeout(() => {
+                container.style.animation = 'float 6s ease-in-out infinite';
+            }, 1000);
+            
+            // Morse Code Converter Module using functional programming approach
+            const MorseConverter = (function() {
+                // Morse code mappings
+                const textToMorseMap = {
+                    'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---',
+                    'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-',
+                    'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 'Z': '--..',
+                    '1': '.----', '2': '..---', '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.', '0': '-----',
+                    '.': '.-.-.-', ',': '--..--', '?': '..--..', "'": '.----.', '!': '-.-.--', '/': '-..-.', '(': '-.--.', ')': '-.--.-',
+                    '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-', '+': '.-.-.', '-': '-....-', '_': '..--.-', '"': '.-..-.', '$': '...-..-', '@': '.--.-.',
+                    ' ': '/'
+                };
+                
+                // Create a reverse mapping for morse to text conversion
+                const morseToTextMap = Object.entries(textToMorseMap).reduce((acc, [key, value]) => {
+                    acc[value] = key;
+                    return acc;
+                }, {});
+                
+                // DOM Elements
+                let inputArea;
+                let resultArea;
+                let convertBtn;
+                let copyBtn;
+                let modeBtns;
+                let inputLabel;
+                let currentMode = 'text-to-morse'; // Default mode
+                
+                // Initialize the converter
+                const init = function() {
+                    // Get DOM elements
+                    inputArea = document.getElementById('input-area');
+                    resultArea = document.getElementById('result-area');
+                    convertBtn = document.getElementById('convert-btn');
+                    copyBtn = document.getElementById('copy-btn');
+                    modeBtns = document.querySelectorAll('.mode-btn');
+                    inputLabel = document.querySelector('.input-label');
+                    
+                    // Set up event listeners
+                    convertBtn.addEventListener('click', convert);
+                    
+                    // Mode toggle
+                    modeBtns.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            // Update active state
+                            modeBtns.forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+                            
+                            // Set current mode
+                            currentMode = this.dataset.mode;
+                            
+                            // Update input label
+                            if (currentMode === 'text-to-morse') {
+                                inputLabel.textContent = 'Enter Text:';
+                                inputArea.placeholder = 'Type here...';
+                                inputArea.classList.remove('morse-input');
+                                inputArea.classList.add('text-input');
+                            } else {
+                                inputLabel.textContent = 'Enter Morse Code:';
+                                inputArea.placeholder = 'Use . for dots, - for dashes, / for spaces...';
+                                inputArea.classList.remove('text-input');
+                                inputArea.classList.add('morse-input');
+                            }
+                            
+                            // Clear result
+                            resultArea.textContent = '';
+                        });
+                    });
+                    
+                    // Copy button
+                    copyBtn.addEventListener('click', function() {
+                        if (resultArea.textContent.trim() !== '') {
+                            navigator.clipboard.writeText(resultArea.textContent)
+                                .then(() => {
+                                    // Show feedback
+                                    const originalIcon = this.innerHTML;
+                                    this.innerHTML = '<i class="fas fa-check"></i>';
+                                    setTimeout(() => {
+                                        this.innerHTML = originalIcon;
+                                    }, 1500);
+                                })
+                                .catch(err => {
+                                    console.error('Failed to copy: ', err);
+                                });
+                        }
+                    });
+                    
+                    // Real-time conversion (optional)
+                    inputArea.addEventListener('input', function() {
+                        convert();
+                    });
+                    
+                    // Populate reference grid
+                    populateReferenceGrid();
+                };
+                
+                // Populate Morse code reference grid
+                const populateReferenceGrid = function() {
+                    const grid = document.getElementById('reference-grid');
+                    const commonChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?';
+                    
+                    commonChars.split('').forEach(char => {
+                        const morse = textToMorseMap[char] || '';
+                        const charElement = document.createElement('div');
+                        charElement.className = 'morse-char';
+                        charElement.innerHTML = `
+                            <div class="char-symbol">${char}</div>
+                            <div class="char-code">${morse}</div>
+                        `;
+                        grid.appendChild(charElement);
+                    });
+                };
+                
+                // Convert based on current mode
+                const convert = function() {
+                    const input = inputArea.value.trim();
+                    
+                    if (input === '') {
+                        resultArea.textContent = '';
+                        return;
+                    }
+                    
+                    let result = '';
+                    
+                    if (currentMode === 'text-to-morse') {
+                        result = convertTextToMorse(input);
+                    } else {
+                        result = convertMorseToText(input);
+                    }
+                    
+                    resultArea.textContent = result;
+                    
+                    // Add animation to result
+                    resultArea.style.opacity = '0';
+                    setTimeout(() => {
+                        resultArea.style.opacity = '1';
+                    }, 50);
+                };
+                
+                // Convert text to Morse code
+                const convertTextToMorse = function(text) {
+                    return text.toUpperCase().split('')
+                        .map(char => textToMorseMap[char] || char)
+                        .join(' ');
+                };
+                
+                // Convert Morse code to text
+                const convertMorseToText = function(morse) {
+                    return morse.split(' ')
+                        .map(code => morseToTextMap[code] || code)
+                        .join('');
+                };
+                
+                // Return public methods
+                return {
+                    init
+                };
+            })();
+            
+            // Initialize the Morse code converter
+            MorseConverter.init();
+        });
+    </script>
+</body>
+</html> 

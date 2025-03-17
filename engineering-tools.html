@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converters & Engineering Tools - CalcHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="redirect.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --text-light: #f8fafc;
+            --text-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            padding: 8rem 2rem 4rem;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1a1a2e);
+            color: var(--text-light);
+        }
+
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+        }
+
+        .centered-content {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.8s ease;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        .page-title {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .page-description {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+        
+        .tool-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tool-icon {
+            font-size: 2.5rem;
+            color: #fff;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-card:hover .tool-icon {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+        
+        .tool-title {
+            font-size: 1.8rem;
+            color: #fff;
+            margin: 0;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        
+        .tool-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .converter-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        select.input-field {
+            cursor: pointer;
+            appearance: none;
+            padding-right: 2.5rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 1.2rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .result-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+        
+        .result-value {
+            font-size: 1.5rem;
+            color: #fff;
+            font-family: 'Monaco', monospace;
+        }
+        
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+                padding: 0.5rem;
+            }
+            
+            .tool-card {
+                padding: 1.5rem;
+                min-height: 240px;
+            }
+            
+            .tool-title {
+                font-size: 1.5rem;
+            }
+            
+            .converter-container {
+                padding: 1.5rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Divine Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            background: linear-gradient(
+                135deg,
+                rgba(15, 23, 42, 0.85),
+                rgba(30, 27, 75, 0.85),
+                rgba(88, 28, 135, 0.85)
+            );
+            border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 
+                0 4px 30px rgba(0, 0, 0, 0.1),
+                0 0 20px rgba(99, 102, 241, 0.1);
+            animation: navbarGlow 8s ease-in-out infinite;
+        }
+
+        @keyframes navbarGlow {
+            0%, 100% { 
+                border-color: rgba(99, 102, 241, 0.2);
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), 0 0 20px rgba(99, 102, 241, 0.1);
+            }
+            50% { 
+                border-color: rgba(6, 182, 212, 0.3);
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), 0 0 30px rgba(6, 182, 212, 0.2);
+            }
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            position: relative;
+            padding: 0.5rem;
+            transition: all 0.4s ease;
+            transform-style: preserve-3d;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            animation: calculatorSpin 8s ease-in-out infinite;
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+
+        @keyframes calculatorSpin {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(10deg) scale(1.1); }
+            75% { transform: rotate(-10deg) scale(1.1); }
+        }
+
+        .logo:hover {
+            transform: translateY(-2px) translateZ(10px);
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1, #06b6d4, #8b5cf6);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: -1;
+            transform: translateZ(-1px);
+        }
+
+        .logo:hover::after {
+            opacity: 0.15;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.8rem 1.4rem;
+            border-radius: 8px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 50%,
+                rgba(99, 102, 241, 0.2) 50%,
+                rgba(99, 102, 241, 0.2) 100%
+            );
+            background-size: 220% 100%;
+            background-position: 100% 0;
+        }
+
+        .nav-link:hover {
+            background-position: 0 0;
+            transform: translateY(-2px);
+            color: #fff;
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, #6366f1, #06b6d4);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+
+        .nav-link:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-link {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Divine Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="javascript:void(0)" onclick="window.location.href='index.html'" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+            <div class="nav-links">
+                <a href="javascript:void(0)" onclick="window.location.href='calculator.html'" class="nav-link">Calculator</a>
+                <a href="javascript:void(0)" onclick="window.location.href='scientific-calculator.html'" class="nav-link">Scientific</a>
+                <a href="javascript:void(0)" onclick="window.location.href='graphing.html'" class="nav-link">Graphing</a>
+                <a href="index.html#tools" class="nav-link">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Divine Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <div class="centered-content">
+                <h1 class="page-title">Unit Converters & Engineering Tools</h1>
+                <p class="page-description">Advanced tools for engineers and technical professionals</p>
+            </div>
+
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <i class="fas fa-calculator tool-icon"></i>
+                        <h3 class="tool-title">Binary, Octal, Hex Converter</h3>
+                    </div>
+                    <p class="tool-description">Convert numbers between decimal, binary, octal, and hexadecimal formats.</p>
+                    <a href="javascript:void(0)" class="btn" onclick="document.getElementById('number-converter').click()">Open</a>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <i class="fas fa-table tool-icon"></i>
+                        <h3 class="tool-title">Matrix to LaTeX</h3>
+                    </div>
+                    <p class="tool-description">Create matrices and generate LaTeX code for mathematical expressions.</p>
+                    <a href="javascript:void(0)" class="btn" onclick="document.getElementById('matrix-latex').click()">Open</a>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <i class="fas fa-flask tool-icon"></i>
+                        <h3 class="tool-title">Physics Calculator</h3>
+                    </div>
+                    <p class="tool-description">Solve common physics problems in kinematics, electricity, and thermodynamics.</p>
+                    <a href="javascript:void(0)" class="btn" onclick="document.getElementById('physics-calculator').click()">Open</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab Switching Logic
+        document.querySelectorAll('.tabs .tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // If this is a main tab
+                if(tabId) {
+                    // Remove active class from all tabs and contents
+                    document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                }
+                
+                // If this is a subtab (for physics calculator)
+                const subtabId = tab.getAttribute('data-subtab');
+                if(subtabId) {
+                    // Remove active class from all subtabs and contents
+                    document.querySelectorAll('[data-subtab]').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.subtab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked subtab and corresponding content
+                    tab.classList.add('active');
+                    document.getElementById(subtabId).classList.add('active');
+                }
+            });
+        });
+
+        // Number Converter Logic
+        document.getElementById('convert-btn').addEventListener('click', () => {
+            const input = document.getElementById('number-input').value;
+            const inputBase = parseInt(document.querySelector('input[name="input-base"]:checked').value);
+            
+            // Convert to decimal first
+            let decimal;
+            try {
+                decimal = parseInt(input, inputBase);
+                
+                // Check if the conversion was valid
+                if (isNaN(decimal)) {
+                    throw new Error('Invalid number format');
+                }
+                
+                // Convert to all bases
+                document.getElementById('decimal-result').value = decimal.toString(10);
+                document.getElementById('binary-result').value = decimal.toString(2);
+                document.getElementById('octal-result').value = decimal.toString(8);
+                document.getElementById('hex-result').value = decimal.toString(16).toUpperCase();
+            } catch (error) {
+                alert('Invalid input. Please check your number format and base selection.');
+            }
+        });
+
+        // Matrix to LaTeX Logic
+        document.getElementById('create-matrix-btn').addEventListener('click', createMatrix);
+        document.getElementById('generate-latex-btn').addEventListener('click', generateLatex);
+        document.getElementById('copy-latex-btn').addEventListener('click', copyLatexToClipboard);
+
+        function createMatrix() {
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            const container = document.getElementById('matrix-container');
+            
+            container.innerHTML = '';
+            
+            for (let i = 0; i < rows; i++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'matrix-row';
+                
+                for (let j = 0; j < cols; j++) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'input-field matrix-cell';
+                    input.dataset.row = i;
+                    input.dataset.col = j;
+                    input.value = '0';
+                    rowDiv.appendChild(input);
+                }
+                
+                container.appendChild(rowDiv);
+            }
+        }
+
+        function generateLatex() {
+            const matrixType = document.querySelector('input[name="matrix-type"]:checked').value;
+            const rows = parseInt(document.getElementById('matrix-rows').value);
+            const cols = parseInt(document.getElementById('matrix-cols').value);
+            let latexCode = '\\begin{' + matrixType + '}\n';
+            
+            for (let i = 0; i < rows; i++) {
+                let rowStr = '';
+                for (let j = 0; j < cols; j++) {
+                    const cell = document.querySelector(`input[data-row="${i}"][data-col="${j}"]`);
+                    rowStr += cell.value;
+                    if (j < cols - 1) {
+                        rowStr += ' & ';
+                    }
+                }
+                latexCode += '    ' + rowStr;
+                if (i < rows - 1) {
+                    latexCode += ' \\\\\n';
+                } else {
+                    latexCode += '\n';
+                }
+            }
+            
+            latexCode += '\\end{' + matrixType + '}';
+            document.getElementById('latex-result').value = latexCode;
+            
+            // Update preview
+            document.getElementById('latex-preview').innerHTML = '$$' + latexCode + '$$';
+            if (window.MathJax) {
+                MathJax.typeset();
+            }
+        }
+
+        function copyLatexToClipboard() {
+            const latexResult = document.getElementById('latex-result');
+            latexResult.select();
+            document.execCommand('copy');
+            alert('LaTeX code copied to clipboard!');
+        }
+
+        // Physics Calculator Logic
+        document.getElementById('solve-kinematics-btn').addEventListener('click', solveKinematics);
+        document.getElementById('solve-electricity-btn').addEventListener('click', solveElectricity);
+        document.getElementById('solve-thermo-btn').addEventListener('click', solveThermodynamics);
+
+        function solveKinematics() {
+            const u = parseFloat(document.getElementById('initial-velocity').value) || null;
+            const v = parseFloat(document.getElementById('final-velocity').value) || null;
+            const a = parseFloat(document.getElementById('acceleration').value) || null;
+            const t = parseFloat(document.getElementById('time').value) || null;
+            const s = parseFloat(document.getElementById('displacement').value) || null;
+            
+            const result = document.getElementById('kinematics-result');
+            let html = '<h3>Results:</h3>';
+            
+            // Count how many variables we have
+            const variables = [u, v, a, t, s];
+            const filledCount = variables.filter(variable => variable !== null).length;
+            
+            if (filledCount < 3) {
+                html += '<p>Please enter at least 3 values to solve for the remaining variables.</p>';
+                result.innerHTML = html;
+                return;
+            }
+            
+            // Solve for different scenarios
+            try {
+                // Case 1: u, v, a are known
+                if (u !== null && v !== null && a !== null) {
+                    const calculatedT = (v - u) / a;
+                    const calculatedS = u * calculatedT + 0.5 * a * calculatedT * calculatedT;
+                    
+                    html += `<p>Time (t) = ${calculatedT.toFixed(3)} s</p>`;
+                    html += `<p>Displacement (s) = ${calculatedS.toFixed(3)} m</p>`;
+                }
+                // More cases can be added for other combinations
+                else if (u !== null && v !== null && t !== null) {
+                    const calculatedA = (v - u) / t;
+                    const calculatedS = u * t + 0.5 * calculatedA * t * t;
+                    
+                    html += `<p>Acceleration (a) = ${calculatedA.toFixed(3)} m/s²</p>`;
+                    html += `<p>Displacement (s) = ${calculatedS.toFixed(3)} m</p>`;
+                }
+                // Add more cases for other combinations
+                
+                result.innerHTML = html;
+            } catch (error) {
+                result.innerHTML = '<h3>Results:</h3><p>Error in calculation. Please check your input values.</p>';
+            }
+        }
+
+        function solveElectricity() {
+            const v = parseFloat(document.getElementById('voltage').value) || null;
+            const i = parseFloat(document.getElementById('current').value) || null;
+            const r = parseFloat(document.getElementById('resistance').value) || null;
+            const p = parseFloat(document.getElementById('power').value) || null;
+            
+            const result = document.getElementById('electricity-result');
+            let html = '<h3>Results:</h3>';
+            
+            // Count how many variables we have
+            const variables = [v, i, r, p];
+            const filledCount = variables.filter(variable => variable !== null).length;
+            
+            if (filledCount < 2) {
+                html += '<p>Please enter at least 2 values to solve for the remaining variables.</p>';
+                result.innerHTML = html;
+                return;
+            }
+            
+            // Solve for different scenarios
+            try {
+                // V and I are known
+                if (v !== null && i !== null) {
+                    const calculatedR = v / i;
+                    const calculatedP = v * i;
+                    
+                    html += `<p>Resistance (R) = ${calculatedR.toFixed(3)} Ω</p>`;
+                    html += `<p>Power (P) = ${calculatedP.toFixed(3)} W</p>`;
+                }
+                // V and R are known
+                else if (v !== null && r !== null) {
+                    const calculatedI = v / r;
+                    const calculatedP = v * calculatedI;
+                    
+                    html += `<p>Current (I) = ${calculatedI.toFixed(3)} A</p>`;
+                    html += `<p>Power (P) = ${calculatedP.toFixed(3)} W</p>`;
+                }
+                // Add more cases for other combinations
+                
+                result.innerHTML = html;
+            } catch (error) {
+                result.innerHTML = '<h3>Results:</h3><p>Error in calculation. Please check your input values.</p>';
+            }
+        }
+
+        function solveThermodynamics() {
+            const m = parseFloat(document.getElementById('mass').value) || null;
+            const c = parseFloat(document.getElementById('specific-heat').value) || null;
+            const deltaT = parseFloat(document.getElementById('temp-change').value) || null;
+            const q = parseFloat(document.getElementById('heat').value) || null;
+            
+            const result = document.getElementById('thermo-result');
+            let html = '<h3>Results:</h3>';
+            
+            // Count how many variables we have
+            const variables = [m, c, deltaT, q];
+            const filledCount = variables.filter(variable => variable !== null).length;
+            
+            if (filledCount < 3) {
+                html += '<p>Please enter at least 3 values to solve for the remaining variable.</p>';
+                result.innerHTML = html;
+                return;
+            }
+            
+            // Solve using Q = mcΔT
+            try {
+                if (q === null) {
+                    const calculatedQ = m * c * deltaT;
+                    html += `<p>Heat Energy (Q) = ${calculatedQ.toFixed(3)} J</p>`;
+                } else if (m === null) {
+                    const calculatedM = q / (c * deltaT);
+                    html += `<p>Mass (m) = ${calculatedM.toFixed(3)} kg</p>`;
+                } else if (c === null) {
+                    const calculatedC = q / (m * deltaT);
+                    html += `<p>Specific Heat (c) = ${calculatedC.toFixed(3)} J/kg·K</p>`;
+                } else if (deltaT === null) {
+                    const calculatedDeltaT = q / (m * c);
+                    html += `<p>Temperature Change (ΔT) = ${calculatedDeltaT.toFixed(3)} K</p>`;
+                }
+                
+                result.innerHTML = html;
+            } catch (error) {
+                result.innerHTML = '<h3>Results:</h3><p>Error in calculation. Please check your input values.</p>';
+            }
+        }
+
+        // Create matrix on page load
+        document.addEventListener('DOMContentLoaded', createMatrix);
+    </script>
+</body>
+</html> 

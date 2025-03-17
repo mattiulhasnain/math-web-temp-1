@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Tools - CalcHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="script.js" defer></script>
+    <style>
+        /* Math Tools specific styles */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .tool-card {
+            position: relative;
+            padding: 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            transition: all var(--transition-medium);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--text-light);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            background: var(--glass-bg-hover);
+            border-color: var(--glass-border-hover);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .tool-card:hover .tool-icon i {
+            transform: scale(1.1);
+        }
+
+        .tool-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .tool-icon i {
+            font-size: 1.5rem;
+            color: white;
+            transition: transform var(--transition-medium);
+        }
+        
+        .tool-card h3 {
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .tool-card p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+        
+        .tool-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            padding: 0.5rem 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-full);
+            color: var(--text-light);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: var(--primary);
+            border-color: var(--primary-dark);
+        }
+        
+        .category-btn.active {
+            font-weight: 500;
+        }
+        
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-full);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all var(--transition-medium);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            background: var(--glass-bg-hover);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .tool-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-lighter);
+            border-radius: var(--border-radius-full);
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .tool-new {
+            background: rgba(16, 185, 129, 0.2);
+            color: rgb(52, 211, 153);
+        }
+        
+        .tool-popular {
+            background: rgba(245, 158, 11, 0.2);
+            color: rgb(251, 191, 36);
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header / Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                <span>CalcHub</span>
+            </a>
+            <nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="calculator.html" class="nav-link">Calculator</a></li>
+                    <li><a href="scientific-calculator.html" class="nav-link">Scientific</a></li>
+                    <li><a href="math-tools.html" class="nav-link active">Math Tools</a></li>
+                    <li><a href="converter.html" class="nav-link">Converters</a></li>
+                    <li><a href="engineering-tools.html" class="nav-link">Engineering</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h1 class="gradient-text">Math Tools</h1>
+                <p class="section-subtitle">Explore our comprehensive collection of mathematical tools</p>
+            </div>
+
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="tool-search" class="search-input" placeholder="Search for a tool...">
+            </div>
+
+            <div class="tool-categories">
+                <button class="category-btn active" data-category="all">
+                    <i class="fas fa-th-large"></i> All Tools
+                </button>
+                <button class="category-btn" data-category="algebra">
+                    <i class="fas fa-superscript"></i> Algebra
+                </button>
+                <button class="category-btn" data-category="calculus">
+                    <i class="fas fa-integral"></i> Calculus
+                </button>
+                <button class="category-btn" data-category="geometry">
+                    <i class="fas fa-shapes"></i> Geometry
+                </button>
+                <button class="category-btn" data-category="statistics">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </button>
+                <button class="category-btn" data-category="numbers">
+                    <i class="fas fa-hashtag"></i> Number Theory
+                </button>
+            </div>
+
+            <div class="tools-grid">
+                <!-- Algebra Tools -->
+                <a href="equation-solver.html" class="tool-card" data-category="algebra">
+                    <div class="tool-badge tool-popular">Popular</div>
+                    <div class="tool-icon">
+                        <i class="fas fa-not-equal"></i>
+                    </div>
+                    <h3>Equation Solver</h3>
+                    <p>Solve linear, quadratic, and polynomial equations with step-by-step solutions.</p>
+                </a>
+                
+                <a href="matrix-calculator.html" class="tool-card" data-category="algebra">
+                    <div class="tool-icon">
+                        <i class="fas fa-border-all"></i>
+                    </div>
+                    <h3>Matrix Calculator</h3>
+                    <p>Perform matrix operations including addition, multiplication, determinants, and more.</p>
+                </a>
+                
+                <a href="polynomial-calculator.html" class="tool-card" data-category="algebra">
+                    <div class="tool-icon">
+                        <i class="fas fa-superscript"></i>
+                    </div>
+                    <h3>Polynomial Calculator</h3>
+                    <p>Add, subtract, multiply, and find roots of polynomial expressions.</p>
+                </a>
+                
+                <a href="fraction-calculator.html" class="tool-card" data-category="algebra">
+                    <div class="tool-icon">
+                        <i class="fas fa-divide"></i>
+                    </div>
+                    <h3>Fraction Calculator</h3>
+                    <p>Calculate with fractions and convert between fractions and decimals.</p>
+                </a>
+                
+                <a href="complex-numbers.html" class="tool-card" data-category="algebra">
+                    <div class="tool-icon">
+                        <i class="fas fa-wave-square"></i>
+                    </div>
+                    <h3>Complex Numbers</h3>
+                    <p>Perform operations with complex numbers and visualize them on a plane.</p>
+                </a>
+                
+                <!-- Calculus Tools -->
+                <a href="derivative-calculator.html" class="tool-card" data-category="calculus">
+                    <div class="tool-badge tool-popular">Popular</div>
+                    <div class="tool-icon">
+                        <i class="fas fa-function"></i>
+                    </div>
+                    <h3>Derivative Calculator</h3>
+                    <p>Calculate derivatives with step-by-step solutions and explanations.</p>
+                </a>
+                
+                <a href="integral-calculator.html" class="tool-card" data-category="calculus">
+                    <div class="tool-icon">
+                        <i class="fas fa-integral"></i>
+                    </div>
+                    <h3>Integral Calculator</h3>
+                    <p>Compute definite and indefinite integrals with detailed steps.</p>
+                </a>
+                
+                <a href="limit-calculator.html" class="tool-card" data-category="calculus">
+                    <div class="tool-icon">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <h3>Limit Calculator</h3>
+                    <p>Evaluate limits of functions as they approach specific values.</p>
+                </a>
+                
+                <a href="taylor-series.html" class="tool-card" data-category="calculus">
+                    <div class="tool-badge tool-new">New</div>
+                    <div class="tool-icon">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                    <h3>Taylor Series</h3>
+                    <p>Approximate functions using Taylor series expansions at specified points.</p>
+                </a>
+                
+                <!-- Geometry Tools -->
+                <a href="interactive-geometry.html" class="tool-card" data-category="geometry">
+                    <div class="tool-icon">
+                        <i class="fas fa-draw-polygon"></i>
+                    </div>
+                    <h3>Interactive Geometry</h3>
+                    <p>Construct and explore geometric shapes, angles, and transformations.</p>
+                </a>
+                
+                <a href="area-calculator.html" class="tool-card" data-category="geometry">
+                    <div class="tool-badge tool-popular">Popular</div>
+                    <div class="tool-icon">
+                        <i class="fas fa-square"></i>
+                    </div>
+                    <h3>Area Calculator</h3>
+                    <p>Calculate areas of various shapes including polygons and circles.</p>
+                </a>
+                
+                <a href="volume-calculator.html" class="tool-card" data-category="geometry">
+                    <div class="tool-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <h3>Volume Calculator</h3>
+                    <p>Compute volumes of 3D shapes like cubes, spheres, and cylinders.</p>
+                </a>
+                
+                <a href="coordinate-geometry.html" class="tool-card" data-category="geometry">
+                    <div class="tool-icon">
+                        <i class="fas fa-vector-square"></i>
+                    </div>
+                    <h3>Coordinate Geometry</h3>
+                    <p>Calculate distances, midpoints, slopes, and equations of lines in coordinate systems.</p>
+                </a>
+                
+                <!-- Statistics Tools -->
+                <a href="statistics-calculator.html" class="tool-card" data-category="statistics">
+                    <div class="tool-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Statistics Calculator</h3>
+                    <p>Find mean, median, mode, standard deviation, and other statistical measures.</p>
+                </a>
+                
+                <a href="probability-calculator.html" class="tool-card" data-category="statistics">
+                    <div class="tool-icon">
+                        <i class="fas fa-dice"></i>
+                    </div>
+                    <h3>Probability Calculator</h3>
+                    <p>Calculate various probability distributions and combinations.</p>
+                </a>
+                
+                <a href="regression-analysis.html" class="tool-card" data-category="statistics">
+                    <div class="tool-badge tool-new">New</div>
+                    <div class="tool-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Regression Analysis</h3>
+                    <p>Perform linear and nonlinear regression on datasets with visualization.</p>
+                </a>
+                
+                <!-- Number Theory Tools -->
+                <a href="prime-numbers.html" class="tool-card" data-category="numbers">
+                    <div class="tool-icon">
+                        <i class="fas fa-hashtag"></i>
+                    </div>
+                    <h3>Prime Number Tools</h3>
+                    <p>Generate prime numbers, test primality, and find prime factorizations.</p>
+                </a>
+                
+                <a href="number-base-converter.html" class="tool-card" data-category="numbers">
+                    <div class="tool-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3>Number Base Converter</h3>
+                    <p>Convert numbers between decimal, binary, octal, and hexadecimal systems.</p>
+                </a>
+                
+                <a href="number-sequence.html" class="tool-card" data-category="numbers">
+                    <div class="tool-icon">
+                        <i class="fas fa-sort-numeric-up"></i>
+                    </div>
+                    <h3>Number Sequences</h3>
+                    <p>Generate and analyze various number sequences like Fibonacci and prime numbers.</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-calculator"></i>
+                        <span>CalcHub</span>
+                </a>
+                <p>Advanced Mathematics Made Simple</p>
+            </div>
+            <div class="footer-links">
+                    <div class="footer-links-group">
+                        <h4>Quick Links</h4>
+                    <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="calculator.html">Calculator</a></li>
+                        <li><a href="scientific-calculator.html">Scientific Calculator</a></li>
+                            <li><a href="math-tools.html">Math Tools</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-group">
+                        <h4>Popular Tools</h4>
+                        <ul>
+                            <li><a href="equation-solver.html">Equation Solver</a></li>
+                            <li><a href="graphing.html">Graphing Tool</a></li>
+                            <li><a href="converter.html">Unit Converter</a></li>
+                        <li><a href="calculus.html">Calculus Tools</a></li>
+                    </ul>
+                </div>
+                    <div class="footer-links-group">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="formulas.html">Formula Reference</a></li>
+                            <li><a href="math-tables.html">Math Tables</a></li>
+                            <li><a href="whiteboard.html">Math Whiteboard</a></li>
+                            <li><a href="prime-numbers.html">Prime Numbers</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+                <p>&copy; 2023 CalcHub. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tool filtering functionality
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const toolCards = document.querySelectorAll('.tool-card');
+            const searchInput = document.getElementById('tool-search');
+            
+            // Set active category and filter tools
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active button
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    const category = button.getAttribute('data-category');
+                    
+                    // Filter tools by category
+                    toolCards.forEach(card => {
+                        if (category === 'all' || card.getAttribute('data-category') === category) {
+                            card.style.display = '';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                
+                toolCards.forEach(card => {
+                    const toolName = card.querySelector('h3').textContent.toLowerCase();
+                    const toolDescription = card.querySelector('p').textContent.toLowerCase();
+                    
+                    if (toolName.includes(searchTerm) || toolDescription.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Reset active category button
+                if (searchTerm.length > 0) {
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                } else {
+                    categoryButtons[0].classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

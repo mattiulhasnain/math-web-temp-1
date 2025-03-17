@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalcHub - Advanced Mathematics Made Simple</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="redirect.js" defer></script>
+    <script src="script.js" defer></script>
+    <style>
+        /* Home page specific styles */
+        .hero-section {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            background: linear-gradient(to right, #60a5fa, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-description {
+            font-size: 1.5rem;
+            max-width: 750px;
+            margin: 0 auto 3rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            font-weight: 600;
+            font-size: 1.125rem;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.5);
+        }
+
+        .cta-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-weight: 600;
+            font-size: 1.125rem;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cta-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(79, 70, 229, 0.3), rgba(139, 92, 246, 0.3));
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .shape:nth-child(1) {
+            width: 250px;
+            height: 250px;
+            top: -50px;
+            left: -100px;
+            opacity: 0.7;
+        }
+
+        .shape:nth-child(2) {
+            width: 350px;
+            height: 350px;
+            bottom: -150px;
+            right: -100px;
+            opacity: 0.5;
+            animation-delay: 5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 30%;
+            right: 20%;
+            opacity: 0.6;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(4) {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 15%;
+            opacity: 0.4;
+            animation-delay: 7s;
+        }
+
+        .features-section {
+            padding: 5rem 2rem;
+            background: rgba(15, 23, 42, 0.3);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .section-description {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.75rem;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .feature-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-link {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            margin-top: auto;
+            transition: all 0.3s ease;
+        }
+
+        .feature-link i {
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-link:hover {
+            color: #a78bfa;
+        }
+
+        .feature-link:hover i {
+            transform: translateX(5px);
+        }
+
+        .tools-section {
+            padding: 5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, #4f46e5, #8b5cf6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tool-card:hover::before {
+            opacity: 1;
+        }
+
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(79, 70, 229, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: #8b5cf6;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover .tool-icon {
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .tool-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .tool-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: auto;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .tool-button:hover {
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            border-color: transparent;
+            transform: translateY(-3px);
+        }
+
+        /* Search Overlay */
+        .search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 15vh;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .search-container {
+            width: 90%;
+            max-width: 700px;
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-title {
+            font-size: 1.5rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .search-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .search-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .search-form {
+            display: flex;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 1.2rem 2rem;
+            font-size: 1.2rem;
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.2);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+        }
+
+        .search-results {
+            margin-top: 2rem;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .search-results::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .search-results::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .search-results::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .search-results::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-result-item {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .search-result-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .search-result-title {
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .search-result-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .search-result-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Animation Keyframes */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .hero-description {
+                font-size: 1.3rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-description {
+                font-size: 1.1rem;
+            }
+
+            .cta-primary, .cta-secondary {
+                width: 100%;
+                padding: 0.8rem;
+                font-size: 1rem;
+            }
+
+            .features-grid, .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                width: 95%;
+            }
+
+            .search-input {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Transition Overlay -->
+    <div class="page-transition-overlay"></div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-container">
+            <div class="search-header">
+                <h3 class="search-title">Search CalcHub</h3>
+                <button class="search-close" id="searchClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="search-form">
+                <input type="text" class="search-input" placeholder="Search for calculators, tools, formulas..." id="searchInput">
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+            <div class="search-results" id="searchResults">
+                <!-- Search results will appear here -->
+        </div>
+        </div>
+    </div>
+
+    <!-- Header / Navigation -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                <span>CalcHub</span>
+            </a>
+            <nav>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link active">Home</a></li>
+                    <li><a href="calculator.html" class="nav-link">Calculator</a></li>
+                    <li><a href="scientific-calculator.html" class="nav-link">Scientific</a></li>
+                    <li><a href="math-tools.html" class="nav-link">Math Tools</a></li>
+                    <li><a href="converter.html" class="nav-link">Converters</a></li>
+                    <li><a href="engineering-tools.html" class="nav-link">Engineering</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+    <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content animate-fade-in">
+                    <h1 class="gradient-text">Advanced Mathematics Made Simple</h1>
+                    <p class="hero-subtitle">Powerful calculators and tools designed for students, professionals, and everyday use</p>
+                    <div class="hero-buttons">
+                        <a href="calculator.html" class="btn btn-primary btn-lg">
+                            <i class="fas fa-calculator"></i>
+                            Launch Calculator
+                        </a>
+                        <a href="math-tools.html" class="btn btn-outline btn-lg">
+                            <i class="fas fa-tools"></i>
+                            Explore Tools
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://via.placeholder.com/600x400" alt="CalcHub Preview" class="animate-slide-up">
+        </div>
+            </div>
+    </section>
+
+    <!-- Features Section -->
+        <section class="section features-section">
+            <div class="container">
+                <div class="section-header text-center mb-5">
+                    <h2 class="gradient-text">Why Choose CalcHub?</h2>
+                    <p class="section-subtitle">Experience the most comprehensive suite of mathematical tools available online</p>
+                </div>
+                <div class="grid grid-3">
+                    <div class="feature-card card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3>Lightning Fast</h3>
+                        <p>Perform complex calculations instantly with our optimized algorithms and responsive interface.</p>
+                    </div>
+                    <div class="feature-card card animate-on-scroll">
+                        <div class="feature-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <h3>Works Everywhere</h3>
+                        <p>Access all tools on any device - desktop, tablet, or mobile - with a consistent experience.</p>
+                    </div>
+                    <div class="feature-card card animate-on-scroll">
+                    <div class="feature-icon">
+                            <i class="fas fa-lock"></i>
+                </div>
+                        <h3>Secure & Private</h3>
+                        <p>All calculations are performed locally in your browser. Your data never leaves your device.</p>
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+        <section class="section tools-section">
+            <div class="container">
+                <div class="section-header text-center mb-5">
+                    <h2 class="gradient-text">Explore Our Tools</h2>
+                    <p class="section-subtitle">Discover our collection of powerful mathematical and engineering tools</p>
+                </div>
+                <div class="grid grid-auto-fit">
+                    <a href="calculator.html" class="tool-card card animate-on-scroll">
+                <div class="tool-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                        <h3>Basic Calculator</h3>
+                        <p>Perform everyday calculations with our intuitive and responsive calculator.</p>
+                    </a>
+                    <a href="scientific-calculator.html" class="tool-card card animate-on-scroll">
+                <div class="tool-icon">
+                    <i class="fas fa-square-root-alt"></i>
+                </div>
+                        <h3>Scientific Calculator</h3>
+                        <p>Advanced functions for trigonometry, logarithms, complex numbers, and more.</p>
+                    </a>
+                    <a href="equation-solver.html" class="tool-card card animate-on-scroll">
+                        <div class="tool-icon">
+                            <i class="fas fa-not-equal"></i>
+            </div>
+                        <h3>Equation Solver</h3>
+                        <p>Solve linear, quadratic, and polynomial equations with step-by-step solutions.</p>
+                    </a>
+                    <a href="graphing.html" class="tool-card card animate-on-scroll">
+                <div class="tool-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                        <h3>Graphing Tool</h3>
+                        <p>Plot and analyze functions with our interactive graphing calculator.</p>
+                    </a>
+                    <a href="math-tables.html" class="tool-card card animate-on-scroll">
+                        <div class="tool-icon">
+                            <i class="fas fa-table"></i>
+            </div>
+                        <h3>Math Tables</h3>
+                        <p>Generate multiplication, division, and other mathematical tables instantly.</p>
+                    </a>
+                    <a href="converter.html" class="tool-card card animate-on-scroll">
+                <div class="tool-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h3>Unit Converter</h3>
+                        <p>Convert between various units of measurement across different categories.</p>
+                    </a>
+                </div>
+                <div class="text-center mt-5">
+                    <a href="math-tools.html" class="btn btn-secondary">
+                        View All Tools
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topics Section -->
+        <section class="section topics-section">
+            <div class="container">
+                <div class="section-header text-center mb-5">
+                    <h2 class="gradient-text">Mathematical Topics</h2>
+                    <p class="section-subtitle">Explore tools organized by mathematical disciplines</p>
+                </div>
+                <div class="grid grid-4">
+                    <a href="calculus.html" class="topic-card card card-highlight animate-on-scroll">
+                        <h3>Calculus</h3>
+                        <p>Derivatives, integrals, limits, and more calculus tools.</p>
+                    </a>
+                    <a href="interactive-geometry.html" class="topic-card card card-highlight animate-on-scroll">
+                        <h3>Geometry</h3>
+                        <p>Interactive tools for geometry problems and visualizations.</p>
+                    </a>
+                    <a href="algorithmic-math.html" class="topic-card card card-highlight animate-on-scroll">
+                        <h3>Algorithms</h3>
+                        <p>Number theory, combinatorics, and computational tools.</p>
+                    </a>
+                    <a href="graph-theory.html" class="topic-card card card-highlight animate-on-scroll">
+                        <h3>Graph Theory</h3>
+                        <p>Tools for working with graphs, networks, and related concepts.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="section cta-section">
+            <div class="container">
+                <div class="cta-card">
+                    <div class="cta-content">
+                        <h2>Ready to Solve Complex Problems?</h2>
+                        <p>Start using our advanced mathematical tools today and make complex calculations simple.</p>
+                        <a href="calculator.html" class="btn btn-primary btn-lg">
+                            Get Started
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-calculator"></i>
+                        <span>CalcHub</span>
+                </a>
+                <p>Advanced Mathematics Made Simple</p>
+        </div>
+            <div class="footer-links">
+                    <div class="footer-links-group">
+                        <h4>Quick Links</h4>
+                    <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="calculator.html">Calculator</a></li>
+                        <li><a href="scientific-calculator.html">Scientific Calculator</a></li>
+                            <li><a href="math-tools.html">Math Tools</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-group">
+                        <h4>Popular Tools</h4>
+                        <ul>
+                            <li><a href="equation-solver.html">Equation Solver</a></li>
+                            <li><a href="graphing.html">Graphing Tool</a></li>
+                            <li><a href="converter.html">Unit Converter</a></li>
+                        <li><a href="calculus.html">Calculus Tools</a></li>
+                    </ul>
+                </div>
+                    <div class="footer-links-group">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="formulas.html">Formula Reference</a></li>
+                            <li><a href="math-tables.html">Math Tables</a></li>
+                            <li><a href="whiteboard.html">Math Whiteboard</a></li>
+                            <li><a href="prime-numbers.html">Prime Numbers</a></li>
+                    </ul>
+            </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 CalcHub. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphing Calculator - CalcHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --secondary-dark: #6d28d9;
+            --accent: #10b981;
+            --accent-dark: #059669;
+            --text-light: #f8fafc;
+            --text-dark: #1e293b;
+            --background: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --nav-bg: rgba(30, 41, 59, 0.95);
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15);
+            --border-radius: 10px;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* Navigation styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* Include all the navigation styles from index.html */
+        /* ... (copy all navbar styles from index.html) ... */
+
+        /* Graphing Calculator Styles */
+        .main-content {
+            padding: 8rem 2rem 4rem;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1a1a2e);
+            color: var(--text-light);
+        }
+
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+        }
+
+        .centered-content {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.8s ease;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        .page-title {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .page-description {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        .graph-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Monaco', monospace;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .graph-canvas {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 400px;
+        }
+
+        .graph-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .color-picker::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker::-webkit-color-swatch {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+        }
+
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
+            .graph-container {
+                padding: 1.5rem;
+            }
+            
+            .graph-controls {
+                flex-direction: column;
+            }
+            
+            .input-group {
+                min-width: 100%;
+            }
+            
+            .graph-options {
+                flex-direction: column;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="nav-links">
+                <a href="index.html" class="nav-link" data-page="home">Home</a>
+                <a href="calculator.html" class="nav-link" data-page="calculator">Basic Calculator</a>
+                <a href="scientific-calculator.html" class="nav-link" data-page="scientific">Scientific</a>
+                <a href="converter.html" class="nav-link" data-page="converter">Unit Converter</a>
+                <a href="morse-converter.html" class="nav-link" data-page="morse">Morse Code</a>
+                <a href="math-tables.html" class="nav-link" data-page="tables">Math Tables</a>
+                <a href="calculus.html" class="nav-link" data-page="calculus">Calculus</a>
+                <a href="graphing.html" class="nav-link active" data-page="graphing">Graphing</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-container">
+            <section class="calculator-section">
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab('2d')">2D Graphing</button>
+                        <button class="tab-btn" onclick="switchTab('3d')">3D Graphing</button>
+                    </div>
+                </div>
+
+                <!-- 2D Graphing Section -->
+                <div id="2d-section">
+                    <h2>2D Function Plotter</h2>
+                    <div class="controls">
+                        <div class="control-group">
+                            <div class="input-group">
+                                <label for="function-2d">Enter function f(x):</label>
+                                <input type="text" id="function-2d" class="input-field" placeholder="e.g., sin(x) + x^2" spellcheck="false">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="input-group">
+                                <label>X Range:</label>
+                                <div class="range-group">
+                                    <input type="number" id="x-min" class="input-field range-input" value="-10" step="1">
+                                    <span>to</span>
+                                    <input type="number" id="x-max" class="input-field range-input" value="10" step="1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-plot" onclick="plot2D()">
+                        <i class="fas fa-chart-line"></i>
+                        Plot Function
+                    </button>
+                    <div id="error-2d" class="error-message"></div>
+                    <div id="plot-2d" class="plot-container"></div>
+                </div>
+
+                <!-- 3D Graphing Section -->
+                <div id="3d-section" style="display: none;">
+                    <h2>3D Surface Plotter</h2>
+                    <div class="controls">
+                        <div class="control-group">
+                            <div class="input-group">
+                                <label for="function-3d">Enter function f(x,y):</label>
+                                <input type="text" id="function-3d" class="input-field" placeholder="e.g., sin(x)*cos(y)" spellcheck="false">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="input-group">
+                                <label>Range:</label>
+                                <div class="range-group">
+                                    <input type="number" id="range-min" class="input-field range-input" value="-5" step="1">
+                                    <span>to</span>
+                                    <input type="number" id="range-max" class="input-field range-input" value="5" step="1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-plot" onclick="plot3D()">
+                        <i class="fas fa-cube"></i>
+                        Plot Surface
+                    </button>
+                    <div id="error-3d" class="error-message"></div>
+                    <div id="plot-3d" class="plot-container"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            const tabs = ['2d', '3d'];
+            tabs.forEach(t => {
+                document.getElementById(`${t}-section`).style.display = t === tab ? 'block' : 'none';
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab));
+            });
+        }
+
+        // 2D Plotting
+        function plot2D() {
+            const functionInput = document.getElementById('function-2d').value;
+            const xMin = parseFloat(document.getElementById('x-min').value);
+            const xMax = parseFloat(document.getElementById('x-max').value);
+            const errorDiv = document.getElementById('error-2d');
+
+            try {
+                // Generate x values
+                const xValues = [];
+                const yValues = [];
+                const step = (xMax - xMin) / 1000;
+
+                // Compile the function
+                const f = math.compile(functionInput);
+
+                // Calculate points
+                for (let x = xMin; x <= xMax; x += step) {
+                    try {
+                        const y = f.evaluate({x: x});
+                        if (!isNaN(y) && isFinite(y)) {
+                            xValues.push(x);
+                            yValues.push(y);
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+
+                // Create the plot
+                const trace = {
+                    x: xValues,
+                    y: yValues,
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: {
+                        color: '#2563eb',
+                        width: 2
+                    },
+                    name: functionInput
+                };
+
+                const layout = {
+                    title: `f(x) = ${functionInput}`,
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'white',
+                    font: {
+                        family: 'Inter, sans-serif'
+                    },
+                    xaxis: {
+                        title: 'x',
+                        gridcolor: '#e2e8f0',
+                        zerolinecolor: '#64748b'
+                    },
+                    yaxis: {
+                        title: 'f(x)',
+                        gridcolor: '#e2e8f0',
+                        zerolinecolor: '#64748b'
+                    }
+                };
+
+                Plotly.newPlot('plot-2d', [trace], layout);
+                errorDiv.style.display = 'none';
+            } catch (error) {
+                errorDiv.textContent = 'Error: Invalid function';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        // 3D Plotting
+        function plot3D() {
+            const functionInput = document.getElementById('function-3d').value;
+            const rangeMin = parseFloat(document.getElementById('range-min').value);
+            const rangeMax = parseFloat(document.getElementById('range-max').value);
+            const errorDiv = document.getElementById('error-3d');
+
+            try {
+                // Compile the function
+                const f = math.compile(functionInput);
+
+                // Generate grid points
+                const steps = 50;
+                const step = (rangeMax - rangeMin) / steps;
+                
+                const xValues = [];
+                const yValues = [];
+                const zValues = [];
+
+                for (let i = 0; i <= steps; i++) {
+                    const x = rangeMin + i * step;
+                    const row = [];
+                    xValues.push(x);
+                    yValues.push([]);
+                    
+                    for (let j = 0; j <= steps; j++) {
+                        const y = rangeMin + j * step;
+                        yValues[i].push(y);
+                        
+                        try {
+                            const z = f.evaluate({x: x, y: y});
+                            if (!isNaN(z) && isFinite(z)) {
+                                if (!row[j]) row[j] = z;
+                            } else {
+                                row[j] = null;
+                            }
+                        } catch (e) {
+                            row[j] = null;
+                        }
+                    }
+                    zValues.push(row);
+                }
+
+                // Create the surface plot
+                const trace = {
+                    type: 'surface',
+                    x: xValues,
+                    y: yValues[0],
+                    z: zValues,
+                    colorscale: 'Viridis',
+                    contours: {
+                        z: {
+                            show: true,
+                            usecolormap: true,
+                            highlightcolor: "#42a5f5",
+                            project: {z: true}
+                        }
+                    }
+                };
+
+                const layout = {
+                    title: `f(x,y) = ${functionInput}`,
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    scene: {
+                        xaxis: {title: 'x'},
+                        yaxis: {title: 'y'},
+                        zaxis: {title: 'f(x,y)'},
+                        camera: {
+                            eye: {x: 1.5, y: 1.5, z: 1.5}
+                        }
+                    },
+                    font: {
+                        family: 'Inter, sans-serif'
+                    }
+                };
+
+                Plotly.newPlot('plot-3d', [trace], layout);
+                errorDiv.style.display = 'none';
+            } catch (error) {
+                errorDiv.textContent = 'Error: Invalid function';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        // Navigation and UI scripts
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navbar scroll effect
+            const navbar = document.querySelector('.navbar');
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 100) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Mobile menu
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    mobileMenuBtn.classList.toggle('active');
+                });
+            }
+
+            // Plot initial examples
+            document.getElementById('function-2d').value = 'sin(x)';
+            plot2D();
+            
+            document.getElementById('function-3d').value = 'sin(x)*cos(y)';
+            plot3D();
+        });
+    </script>
+</body>
+</html> 

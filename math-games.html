@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Games & Interactive Learning - CalcHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="redirect.js" defer></script>
+    <style>
+        /* Math Games specific styles */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .game-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(139, 92, 246, 0.2));
+            border-radius: 16px;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .game-card:hover .game-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transform: rotate(10deg);
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .game-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .game-features {
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .feature-item i {
+            color: var(--primary);
+        }
+
+        .game-buttons {
+            margin-top: auto;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .game-button {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .game-button.primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+        }
+
+        .game-button:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .game-button.primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .skill-level {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .skill-beginner {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .skill-intermediate {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .skill-advanced {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-card {
+                padding: 1.5rem;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .game-icon {
+                margin: 0 auto;
+            }
+            
+            .game-title {
+                font-size: 1.5rem;
+                text-align: center;
+                width: 100%;
+            }
+            
+            .game-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Transition Overlay -->
+    <div class="page-transition-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="calculator.html" class="nav-link">Calculator</a>
+                <a href="scientific-calculator.html" class="nav-link">Scientific</a>
+                <a href="math-tools.html" class="nav-link">Math Tools</a>
+                <a href="calculus.html" class="nav-link">Calculus</a>
+                <a href="graphing.html" class="nav-link">Graphing</a>
+                <a href="math-games.html" class="nav-link active">Games</a>
+                <button class="search-toggle">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="theme-switcher">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay">
+        <div class="search-container">
+            <button class="search-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="search-content">
+                <h2>Search CalcHub</h2>
+                <div class="search-input-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Enter keywords to search...">
+                </div>
+                <div class="search-results">
+                    <!-- Results will be dynamically populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-container">
+            <div class="centered-content">
+                <h1 class="page-title">Math <span class="gradient-text">Games</span></h1>
+                <p class="page-description">
+                    Learn and practice mathematical concepts through fun, interactive games and challenges.
+                    Improve your skills while enjoying the process of discovery.
+                </p>
+            </div>
+
+            <div class="games-grid">
+                <!-- Number Puzzle Game -->
+                <div class="game-card animate-on-scroll">
+                    <span class="skill-level skill-beginner">Beginner Friendly</span>
+                    <div class="game-header">
+                        <div class="game-icon">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <h2 class="game-title">Number Puzzle</h2>
+                    </div>
+                    <p class="game-description">
+                        Arrange the numbers in ascending order by sliding tiles in this classic puzzle game. 
+                        Train your logical thinking and spatial reasoning skills.
+                    </p>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">5+</div>
+                            <div class="stat-label">Difficulty Levels</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3,500+</div>
+                            <div class="stat-label">Monthly Players</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4.8</div>
+                            <div class="stat-label">User Rating</div>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Multiple grid sizes (3×3, 4×4, 5×5)</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Time tracking and move counter</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Global leaderboards</span>
+                        </li>
+                    </ul>
+                    <div class="game-buttons">
+                        <button class="game-button primary" onclick="openGame('number-puzzle')">
+                            <i class="fas fa-play"></i> Play Now
+                        </button>
+                        <button class="game-button" onclick="showRules('number-puzzle')">
+                            <i class="fas fa-info-circle"></i> How to Play
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Math Memory Match -->
+                <div class="game-card animate-on-scroll">
+                    <span class="skill-level skill-beginner">Beginner Friendly</span>
+                    <div class="game-header">
+                        <div class="game-icon">
+                            <i class="fas fa-clone"></i>
+                        </div>
+                        <h2 class="game-title">Math Memory Match</h2>
+                    </div>
+                    <p class="game-description">
+                        Find matching equation pairs in this memory card game. Match expressions with their 
+                        results to improve your mental calculation skills while having fun.
+                    </p>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">4</div>
+                            <div class="stat-label">Math Operations</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">2,800+</div>
+                            <div class="stat-label">Monthly Players</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4.7</div>
+                            <div class="stat-label">User Rating</div>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Addition, subtraction, multiplication, and division</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Adjustable difficulty levels</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Time-based challenges</span>
+                        </li>
+                    </ul>
+                    <div class="game-buttons">
+                        <button class="game-button primary" onclick="openGame('memory-match')">
+                            <i class="fas fa-play"></i> Play Now
+                        </button>
+                        <button class="game-button" onclick="showRules('memory-match')">
+                            <i class="fas fa-info-circle"></i> How to Play
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Math Trivia Challenge -->
+                <div class="game-card animate-on-scroll">
+                    <span class="skill-level skill-intermediate">Intermediate</span>
+                    <div class="game-header">
+                        <div class="game-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h2 class="game-title">Math Trivia Challenge</h2>
+                    </div>
+                    <p class="game-description">
+                        Test your mathematical knowledge with trivia questions across various topics. Learn 
+                        interesting facts about math history, concepts, and famous mathematicians.
+                    </p>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">500+</div>
+                            <div class="stat-label">Unique Questions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3,100+</div>
+                            <div class="stat-label">Monthly Players</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4.9</div>
+                            <div class="stat-label">User Rating</div>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Multiple math categories</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Single and multiplayer modes</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Detailed explanations for each answer</span>
+                        </li>
+                    </ul>
+                    <div class="game-buttons">
+                        <button class="game-button primary" onclick="openGame('math-trivia')">
+                            <i class="fas fa-play"></i> Play Now
+                        </button>
+                        <button class="game-button" onclick="showRules('math-trivia')">
+                            <i class="fas fa-info-circle"></i> How to Play
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Math Sudoku -->
+                <div class="game-card animate-on-scroll">
+                    <span class="skill-level skill-intermediate">Intermediate</span>
+                    <div class="game-header">
+                        <div class="game-icon">
+                            <i class="fas fa-th"></i>
+                        </div>
+                        <h2 class="game-title">Math Sudoku</h2>
+                    </div>
+                    <p class="game-description">
+                        A mathematical twist on classic Sudoku. Fill the grid with numbers based on various 
+                        mathematical rules and constraints that change with each puzzle.
+                    </p>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Grid Sizes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4,200+</div>
+                            <div class="stat-label">Monthly Players</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4.8</div>
+                            <div class="stat-label">User Rating</div>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Arithmetic, inequality, and hybrid puzzles</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Hint system and solution checker</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Daily new puzzles</span>
+                        </li>
+                    </ul>
+                    <div class="game-buttons">
+                        <button class="game-button primary" onclick="openGame('math-sudoku')">
+                            <i class="fas fa-play"></i> Play Now
+                        </button>
+                        <button class="game-button" onclick="showRules('math-sudoku')">
+                            <i class="fas fa-info-circle"></i> How to Play
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Geometry Explorer -->
+                <div class="game-card animate-on-scroll">
+                    <span class="skill-level skill-intermediate">Intermediate</span>
+                    <div class="game-header">
+                        <div class="game-icon">
+                            <i class="fas fa-draw-polygon"></i>
+                        </div>
+                        <h2 class="game-title">Geometry Explorer</h2>
+                    </div>
+                    <p class="game-description">
+                        Solve geometric puzzles by manipulating shapes, angles, and measurements. Apply 
+                        geometric principles in an interactive and visual learning environment.
+                    </p>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">Geometry Topics</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">2,600+</div>
+                            <div class="stat-label">Monthly Players</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4.6</div>
+                            <div class="stat-label">User Rating</div>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Interactive geometry construction</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Area, perimeter, and angle challenges</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Theorem-based puzzle levels</span>
+                        </li>
+                    </ul>
+                    <div class="game-buttons">
+                        <button class="game-button primary" onclick="openGame('geometry-explorer')">
+                            <i class="fas fa-play"></i> Play Now
+                        </button>
+                        <button class="game-button" onclick="showRules('geometry-explorer')">
+                            <i class="fas fa-info-circle"></i> How to Play
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Algebra Quest -->
+                <div class="game-card animate-on-scroll">
+                    <span class="skill-level skill-advanced">Advanced</span>
+                    <div class="game-header">
+                        <div class="game-icon">
+                            <i class="fas fa-square-root-alt"></i>
+                        </div>
+                        <h2 class="game-title">Algebra Quest</h2>
+                    </div>
+                    <p class="game-description">
+                        Embark on an algebraic adventure where you solve progressively challenging equations 
+                        to unlock new areas and discover mathematical treasures.
+                    </p>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Quest Regions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">1,900+</div>
+                            <div class="stat-label">Monthly Players</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">4.7</div>
+                            <div class="stat-label">User Rating</div>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Story-driven algebraic problem solving</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Character progression system</span>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Boss battles with complex equations</span>
+                        </li>
+                    </ul>
+                    <div class="game-buttons">
+                        <button class="game-button primary" onclick="openGame('algebra-quest')">
+                            <i class="fas fa-play"></i> Play Now
+                        </button>
+                        <button class="game-button" onclick="showRules('algebra-quest')">
+                            <i class="fas fa-info-circle"></i> How to Play
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-calculator"></i>
+                    CalcHub
+                </a>
+                <p>Advanced Mathematics Made Simple</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h3>Calculators</h3>
+                    <ul>
+                        <li><a href="calculator.html">Basic Calculator</a></li>
+                        <li><a href="scientific-calculator.html">Scientific Calculator</a></li>
+                        <li><a href="graphing.html">Graphing Calculator</a></li>
+                        <li><a href="calculus.html">Calculus Tools</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Tools</h3>
+                    <ul>
+                        <li><a href="math-tools.html">Advanced Math Tools</a></li>
+                        <li><a href="converter.html">Unit Converter</a></li>
+                        <li><a href="whiteboard.html">Interactive Whiteboard</a></li>
+                        <li><a href="formulas.html">Formula Library</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 CalcHub. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Game-specific functionality
+        function openGame(gameId) {
+            // In a real implementation, this would launch the game in a modal or redirect to a game page
+            alert(`Opening ${gameId} game. This would launch the game in a real implementation.`);
+        }
+        
+        function showRules(gameId) {
+            // In a real implementation, this would show game rules in a modal
+            alert(`Showing rules for ${gameId}. This would display rules in a modal in a real implementation.`);
+        }
+        
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation class to elements when they come into view
+            const animateOnScroll = () => {
+                const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+                
+                elementsToAnimate.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementPosition < windowHeight - 100) {
+                        element.classList.add('animated');
+                    }
+                });
+            };
+            
+            // Run animation check on load and scroll
+            animateOnScroll();
+            window.addEventListener('scroll', animateOnScroll);
+        });
+    </script>
+</body>
+</html> 

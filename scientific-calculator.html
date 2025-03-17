@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator - CalcHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Scientific Calculator specific styles */
+        .scientific-calculator {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .calculator-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: right;
+            font-family: 'Monaco', monospace;
+        }
+
+        .history-display {
+            min-height: 2rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.5rem;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+        }
+
+        .previous-operand {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            min-height: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .current-operand {
+            font-size: 2.5rem;
+            color: #fff;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.75rem;
+            padding: 1rem;
+        }
+
+        .calculator-btn {
+            padding: 1rem 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .calculator-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .span-two {
+            grid-column: span 2;
+        }
+
+        .operator {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #fff;
+        }
+
+        .operator:hover {
+            background: rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .function {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #fff;
+        }
+
+        .function:hover {
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        #equals {
+            background: rgba(99, 102, 241, 0.4);
+            border-color: rgba(99, 102, 241, 0.5);
+            color: #fff;
+        }
+
+        #equals:hover {
+            background: rgba(99, 102, 241, 0.5);
+            border-color: rgba(99, 102, 241, 0.6);
+        }
+
+        #clear {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fff;
+        }
+
+        #clear:hover {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        #delete {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #fff;
+        }
+
+        #delete:hover {
+            background: rgba(245, 158, 11, 0.3);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .key-indicator {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-toggle button {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-toggle button.active {
+            background: rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #fff;
+        }
+
+        .mode-toggle button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Additional responsive styles */
+        @media (max-width: 768px) {
+            .calculator-display {
+                padding: 1.2rem;
+            }
+            
+            .current-operand {
+                font-size: 2rem;
+            }
+            
+            .buttons-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.6rem;
+            }
+            
+            .calculator-btn {
+                padding: 0.8rem 0.5rem;
+                font-size: 1rem;
+            }
+            
+            .mode-toggle button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Transition Overlay -->
+    <div class="page-transition-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="calculator.html" class="nav-link">Calculator</a>
+                <a href="scientific-calculator.html" class="nav-link active">Scientific</a>
+                <a href="math-tools.html" class="nav-link">Math Tools</a>
+                <a href="calculus.html" class="nav-link">Calculus</a>
+                <a href="graphing.html" class="nav-link">Graphing</a>
+                <a href="math-games.html" class="nav-link">Games</a>
+                <button class="search-toggle">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="theme-switcher">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-container">
+            <div class="centered-content">
+                <h1 class="page-title">Scientific <span class="gradient-text">Calculator</span></h1>
+                <p class="page-description">
+                    Advanced scientific calculator with trigonometric functions, logarithms, 
+                    powers, and more. Perfect for complex mathematical operations.
+                </p>
+        </div>
+        
+            <div class="scientific-calculator-container animate-on-scroll">
+                <div class="scientific-calculator">
+                    <div class="calculator-display">
+                        <div class="history-display" id="history-display"></div>
+                <div class="previous-operand" id="previous-operand"></div>
+                <div class="current-operand" id="current-operand">0</div>
+            </div>
+            
+                    <div class="mode-toggle">
+                        <button id="deg-mode" class="active">DEG</button>
+                        <button id="rad-mode">RAD</button>
+            </div>
+            
+                    <div class="buttons-grid">
+                        <!-- Row 1 -->
+                        <button class="calculator-btn function" id="second">2nd</button>
+                        <button class="calculator-btn function" id="pi">π</button>
+                        <button class="calculator-btn function" id="e">e</button>
+                        <button class="calculator-btn" id="clear">AC</button>
+                        <button class="calculator-btn" id="delete">DEL</button>
+                        <button class="calculator-btn operator" id="divide">÷</button>
+                        
+                        <!-- Row 2 -->
+                        <button class="calculator-btn function" id="square">x²</button>
+                        <button class="calculator-btn function" id="cube">x³</button>
+                        <button class="calculator-btn function" id="power">xʸ</button>
+                        <button class="calculator-btn number">7</button>
+                        <button class="calculator-btn number">8</button>
+                        <button class="calculator-btn number">9</button>
+                        
+                        <!-- Row 3 -->
+                        <button class="calculator-btn function" id="sqrt">√x</button>
+                        <button class="calculator-btn function" id="cbrt">∛x</button>
+                        <button class="calculator-btn function" id="root">ʸ√x</button>
+                        <button class="calculator-btn number">4</button>
+                        <button class="calculator-btn number">5</button>
+                        <button class="calculator-btn number">6</button>
+                        
+                        <!-- Row 4 -->
+                        <button class="calculator-btn function" id="sin">sin</button>
+                        <button class="calculator-btn function" id="cos">cos</button>
+                        <button class="calculator-btn function" id="tan">tan</button>
+                        <button class="calculator-btn number">1</button>
+                        <button class="calculator-btn number">2</button>
+                        <button class="calculator-btn number">3</button>
+                        
+                        <!-- Row 5 -->
+                        <button class="calculator-btn function" id="log">log</button>
+                        <button class="calculator-btn function" id="ln">ln</button>
+                        <button class="calculator-btn function" id="factorial">x!</button>
+                        <button class="calculator-btn operator" id="multiply">×</button>
+                        <button class="calculator-btn operator" id="subtract">−</button>
+                        <button class="calculator-btn operator" id="add">+</button>
+                        
+                        <!-- Row 6 -->
+                        <button class="calculator-btn function" id="open-parenthesis">(</button>
+                        <button class="calculator-btn function" id="close-parenthesis">)</button>
+                        <button class="calculator-btn function" id="percent">%</button>
+                        <button class="calculator-btn number">0</button>
+                        <button class="calculator-btn number">.</button>
+                        <button class="calculator-btn" id="equals">=</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features-grid" style="margin-top: 4rem;">
+                <div class="card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3 class="feature-title">Advanced Functions</h3>
+                    <p>
+                        Access trigonometric functions, logarithms, powers, roots, and more with our
+                        comprehensive scientific calculator interface.
+                    </p>
+                </div>
+                <div class="card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Degree/Radian Mode</h3>
+                    <p>
+                        Switch between degree and radian modes for trigonometric calculations with a
+                        single click, making it perfect for all types of problems.
+                    </p>
+                </div>
+                <div class="card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3 class="feature-title">Calculation History</h3>
+                    <p>
+                        View your calculation history at the top of the calculator, making it easy to
+                        track complex operations and verify results.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="content-section animate-on-scroll" style="margin-top: 4rem;">
+                <h2>How To Use the Scientific Calculator</h2>
+                <p>
+                    Our scientific calculator is designed to be intuitive and powerful. Here's how to get the most out of it:
+                </p>
+                
+                <ol class="instruction-list">
+                    <li>
+                        <strong>Basic Operations:</strong> Enter numbers using the numeric keypad and perform basic
+                        operations (addition, subtraction, multiplication, division) using the operator buttons.
+                    </li>
+                    <li>
+                        <strong>Scientific Functions:</strong> Use the scientific function buttons like sin, cos, tan,
+                        log, ln, etc., to perform advanced calculations.
+                    </li>
+                    <li>
+                        <strong>Parentheses:</strong> Use parentheses to group operations and ensure calculations follow
+                        the correct order of operations.
+                    </li>
+                    <li>
+                        <strong>Mode Switching:</strong> Toggle between Degree and Radian modes using the mode buttons
+                        for trigonometric calculations.
+                    </li>
+                    <li>
+                        <strong>Constants:</strong> Use the π and e buttons to quickly input these mathematical constants.
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-calculator"></i>
+                    CalcHub
+                </a>
+                <p>Advanced Mathematics Made Simple</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h3>Calculators</h3>
+                    <ul>
+                        <li><a href="calculator.html">Basic Calculator</a></li>
+                        <li><a href="scientific-calculator.html">Scientific Calculator</a></li>
+                        <li><a href="graphing.html">Graphing Calculator</a></li>
+                        <li><a href="calculus.html">Calculus Tools</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Tools</h3>
+                    <ul>
+                        <li><a href="math-tools.html">Advanced Math Tools</a></li>
+                        <li><a href="converter.html">Unit Converter</a></li>
+                        <li><a href="whiteboard.html">Interactive Whiteboard</a></li>
+                        <li><a href="formulas.html">Formula Library</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 CalcHub. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="scientific-calculator.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 

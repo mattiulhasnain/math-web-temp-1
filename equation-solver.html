@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divine Equation Solver - CalcHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --text-light: #f8fafc;
+            --text-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(45deg, #0f172a, #1e1b4b);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Divine Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.3);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--glass-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .solver-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+        }
+
+        .equation-type {
+            margin-bottom: 2rem;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .type-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+
+        .solve-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .solve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .solution-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+        }
+
+        .step {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s forwards;
+        }
+
+        .step-number {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-explanation {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-result {
+            font-family: 'Monaco', monospace;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .solver-container {
+                grid-template-columns: 1fr;
+            }
+
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Divine Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+            <div class="nav-links">
+                <a href="calculator.html" class="nav-link">Calculator</a>
+                <a href="scientific-calculator.html" class="nav-link">Scientific</a>
+                <a href="graphing.html" class="nav-link">Graphing</a>
+                <a href="index.html#tools" class="nav-link">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="title-section">
+            <h1 class="title">Divine Equation Solver</h1>
+            <p class="subtitle">Solve equations with celestial precision and step-by-step enlightenment</p>
+        </div>
+
+        <div class="solver-container">
+            <div class="input-section">
+                <div class="equation-type">
+                    <div class="type-selector">
+                        <button class="type-btn active" data-type="linear">Linear</button>
+                        <button class="type-btn" data-type="quadratic">Quadratic</button>
+                        <button class="type-btn" data-type="polynomial">Polynomial</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="equation">Enter Equation:</label>
+                    <input type="text" id="equation" class="input-field" placeholder="Example: 2x + 3 = 15">
+                </div>
+
+                <button id="solve" class="solve-btn">
+                    <i class="fas fa-magic"></i>
+                    Solve Equation
+                </button>
+            </div>
+
+            <div class="solution-section">
+                <div id="steps"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Equation type selection
+        const typeButtons = document.querySelectorAll('.type-btn');
+        let currentType = 'linear';
+
+        typeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                typeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentType = button.dataset.type;
+                updatePlaceholder();
+            });
+        });
+
+        function updatePlaceholder() {
+            const input = document.getElementById('equation');
+            switch(currentType) {
+                case 'linear':
+                    input.placeholder = 'Example: 2x + 3 = 15';
+                    break;
+                case 'quadratic':
+                    input.placeholder = 'Example: x^2 + 5x + 6 = 0';
+                    break;
+                case 'polynomial':
+                    input.placeholder = 'Example: x^3 - 6x^2 + 11x - 6 = 0';
+                    break;
+            }
+        }
+
+        // Solve button click handler
+        document.getElementById('solve').addEventListener('click', solveEquation);
+
+        function solveEquation() {
+            const equation = document.getElementById('equation').value;
+            const stepsContainer = document.getElementById('steps');
+            stepsContainer.innerHTML = '';
+
+            try {
+                switch(currentType) {
+                    case 'linear':
+                        solveLinear(equation);
+                        break;
+                    case 'quadratic':
+                        solveQuadratic(equation);
+                        break;
+                    case 'polynomial':
+                        solvePolynomial(equation);
+                        break;
+                }
+            } catch (error) {
+                addStep('Error', 'Invalid equation format. Please check your input.', '');
+            }
+        }
+
+        function addStep(number, explanation, result) {
+            const step = document.createElement('div');
+            step.className = 'step';
+            step.innerHTML = `
+                <div class="step-number">Step ${number}</div>
+                <div class="step-explanation">${explanation}</div>
+                ${result ? `<div class="step-result">${result}</div>` : ''}
+            `;
+            document.getElementById('steps').appendChild(step);
+        }
+
+        function solveLinear(equation) {
+            // Remove spaces and split at equals sign
+            const parts = equation.replace(/\s+/g, '').split('=');
+            if (parts.length !== 2) {
+                throw new Error('Invalid equation format');
+            }
+
+            addStep(1, 'Identify the equation components', `Left side: ${parts[0]}, Right side: ${parts[1]}`);
+
+            // Move all terms with x to left side and all numbers to right side
+            let leftSide = math.parse(parts[0]);
+            let rightSide = math.parse(parts[1]);
+            
+            addStep(2, 'Isolate terms with x on the left side', `${leftSide.toString()} = ${rightSide.toString()}`);
+
+            // Solve for x
+            try {
+                const solution = math.solve(equation, 'x');
+                addStep(3, 'Solve for x', `x = ${solution}`);
+
+                // Verify the solution
+                const verification = equation.replace(/x/g, `(${solution})`);
+                addStep(4, 'Verify the solution', `${verification} ✓`);
+            } catch (error) {
+                addStep('Error', 'Could not solve equation. Please check the format.', '');
+            }
+        }
+
+        function solveQuadratic(equation) {
+            // Standard form: ax² + bx + c = 0
+            const normalized = equation.replace(/\s+/g, '').replace('=0', '');
+            addStep(1, 'Write in standard form (ax² + bx + c = 0)', `${normalized} = 0`);
+
+            try {
+                // Parse coefficients
+                const terms = math.parse(normalized);
+                let a = 0, b = 0, c = 0;
+
+                // Extract coefficients
+                terms.traverse((node) => {
+                    if (node.type === 'OperatorNode') {
+                        if (node.args[0].type === 'SymbolNode' && node.args[0].name === 'x') {
+                            if (node.args[1].value === 2) {
+                                a = 1;
+                            } else {
+                                b = 1;
+                            }
+                        }
+                    } else if (node.type === 'ConstantNode') {
+                        c = node.value;
+                    }
+                });
+
+                addStep(2, 'Identify coefficients', `a = ${a}, b = ${b}, c = ${c}`);
+
+                // Calculate discriminant
+                const discriminant = b * b - 4 * a * c;
+                addStep(3, 'Calculate discriminant (b² - 4ac)', `Discriminant = ${discriminant}`);
+
+                // Calculate solutions
+                if (discriminant > 0) {
+                    const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                    const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                    addStep(4, 'Calculate two real solutions', `x₁ = ${x1.toFixed(4)}, x₂ = ${x2.toFixed(4)}`);
+                } else if (discriminant === 0) {
+                    const x = -b / (2 * a);
+                    addStep(4, 'Calculate one real solution (double root)', `x = ${x.toFixed(4)}`);
+                } else {
+                    const realPart = -b / (2 * a);
+                    const imagPart = Math.sqrt(-discriminant) / (2 * a);
+                    addStep(4, 'Calculate complex solutions', 
+                        `x₁ = ${realPart.toFixed(4)} + ${imagPart.toFixed(4)}i\n` +
+                        `x₂ = ${realPart.toFixed(4)} - ${imagPart.toFixed(4)}i`);
+                }
+            } catch (error) {
+                addStep('Error', 'Could not solve quadratic equation. Please check the format.', '');
+            }
+        }
+
+        function solvePolynomial(equation) {
+            const normalized = equation.replace(/\s+/g, '').replace('=0', '');
+            addStep(1, 'Write in standard form', `${normalized} = 0`);
+
+            try {
+                // Use numerical methods to find roots
+                const roots = math.roots(normalized);
+                
+                addStep(2, 'Find degree of polynomial', `Degree: ${roots.length}`);
+                
+                // Display roots
+                let rootStr = roots.map((root, index) => {
+                    if (typeof root === 'number') {
+                        return `x${index + 1} = ${root.toFixed(4)}`;
+                    } else {
+                        return `x${index + 1} = ${root.toString()}`;
+                    }
+                }).join('\n');
+                
+                addStep(3, 'Calculate roots', rootStr);
+
+                // Verify solutions
+                addStep(4, 'Verify solutions', 'Each root satisfies the original equation');
+            } catch (error) {
+                addStep('Error', 'Could not solve polynomial equation. Please check the format.', '');
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programming & Algorithmic Math - CalcHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="redirect.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --text-light: #f8fafc;
+            --text-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            padding: 8rem 2rem 4rem;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1a1a2e);
+            color: var(--text-light);
+        }
+
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+        }
+
+        .centered-content {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.8s ease;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        .page-title {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .page-description {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        .tab-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+
+        .tab {
+            padding: 0.8rem 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            white-space: nowrap;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        .tab:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .result-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .visualization-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            min-height: 300px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .tool-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-icon {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tool-title {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .recursion-tree {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            overflow: auto;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .tree-node {
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            position: absolute;
+            transition: all 0.3s ease;
+            color: var(--text-light);
+            backdrop-filter: blur(10px);
+        }
+
+        .tree-connection {
+            position: absolute;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            height: 2px;
+            transform-origin: left center;
+        }
+
+        .complexity-chart {
+            margin-top: 2rem;
+            position: relative;
+            height: 300px;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
+            .tab-container {
+                padding: 1.5rem;
+            }
+            
+            .tabs {
+                gap: 0.5rem;
+            }
+            
+            .tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Divine Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            background: linear-gradient(
+                135deg,
+                rgba(15, 23, 42, 0.85),
+                rgba(30, 27, 75, 0.85),
+                rgba(88, 28, 135, 0.85)
+            );
+            border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 
+                0 4px 30px rgba(0, 0, 0, 0.1),
+                0 0 20px rgba(99, 102, 241, 0.1);
+            animation: navbarGlow 8s ease-in-out infinite;
+        }
+
+        @keyframes navbarGlow {
+            0%, 100% { 
+                border-color: rgba(99, 102, 241, 0.2);
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), 0 0 20px rgba(99, 102, 241, 0.1);
+            }
+            50% { 
+                border-color: rgba(6, 182, 212, 0.3);
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), 0 0 30px rgba(6, 182, 212, 0.2);
+            }
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            position: relative;
+            padding: 0.5rem;
+            transition: all 0.4s ease;
+            transform-style: preserve-3d;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            animation: calculatorSpin 8s ease-in-out infinite;
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+
+        @keyframes calculatorSpin {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(10deg) scale(1.1); }
+            75% { transform: rotate(-10deg) scale(1.1); }
+        }
+
+        .logo:hover {
+            transform: translateY(-2px) translateZ(10px);
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1, #06b6d4, #8b5cf6);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: -1;
+            transform: translateZ(-1px);
+        }
+
+        .logo:hover::after {
+            opacity: 0.15;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.8rem 1.4rem;
+            border-radius: 8px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 50%,
+                rgba(99, 102, 241, 0.2) 50%,
+                rgba(99, 102, 241, 0.2) 100%
+            );
+            background-size: 220% 100%;
+            background-position: 100% 0;
+        }
+
+        .nav-link:hover {
+            background-position: 0 0;
+            transform: translateY(-2px);
+            color: #fff;
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, #6366f1, #06b6d4);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+
+        .nav-link:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-link {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Divine Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="javascript:void(0)" onclick="window.location.href='index.html'" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+            <div class="nav-links">
+                <a href="javascript:void(0)" onclick="window.location.href='calculator.html'" class="nav-link">Calculator</a>
+                <a href="javascript:void(0)" onclick="window.location.href='scientific-calculator.html'" class="nav-link">Scientific</a>
+                <a href="javascript:void(0)" onclick="window.location.href='graphing.html'" class="nav-link">Graphing</a>
+                <a href="index.html#tools" class="nav-link">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay">
+        <div class="search-container">
+            <button class="search-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="search-content">
+                <h2>Search CalcHub</h2>
+                <div class="search-input-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Enter keywords to search...">
+                </div>
+                <div class="search-results">
+                    <!-- Results will be dynamically populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Divine Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <div class="centered-content">
+                <h1 class="page-title">Programming & Algorithmic Math</h1>
+                <p class="page-description">Advanced tools for algorithm analysis and visualization</p>
+            </div>
+
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="big-o">Big-O Calculator</div>
+                    <div class="tab" data-tab="recursion">Recursion Visualizer</div>
+                    <div class="tab" data-tab="sorting">Sorting Algorithms</div>
+                    <div class="tab" data-tab="neural">Neural Network</div>
+                </div>
+
+                <!-- Big-O Calculator Tab -->
+                <div id="big-o" class="tab-content active">
+                    <div class="info-box">
+                        <p>Analyze algorithm efficiency and complexity by entering your code or selecting common patterns.</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Select common algorithm pattern:</label>
+                        <select id="algorithm-pattern" class="input-field">
+                            <option value="linear">Simple Loop (Linear - O(n))</option>
+                            <option value="quadratic">Nested Loop (Quadratic - O(n²))</option>
+                            <option value="logarithmic">Binary Search (Logarithmic - O(log n))</option>
+                            <option value="nlogn">Merge Sort (O(n log n))</option>
+                            <option value="constant">Direct Access (Constant - O(1))</option>
+                            <option value="exponential">Recursive Fibonacci (Exponential - O(2ⁿ))</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Or enter your code:</label>
+                        <textarea id="code-input" class="input-field" rows="6" placeholder="Enter your algorithm code here..."></textarea>
+                    </div>
+                    
+                    <button id="analyze-btn" class="btn">Analyze Complexity</button>
+                    
+                    <div class="result-container">
+                        <h3>Analysis Results:</h3>
+                        <div id="complexity-result"></div>
+                        <div class="complexity-chart">
+                            <canvas id="complexityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recursion Visualizer Tab -->
+                <div id="recursion" class="tab-content">
+                    <div class="info-box">
+                        <p>Visualize recursive function calls and their execution stack.</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Select recursive function:</label>
+                        <select id="recursive-function" class="input-field">
+                            <option value="fibonacci">Fibonacci</option>
+                            <option value="factorial">Factorial</option>
+                            <option value="power">Power Function</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Input value:</label>
+                        <input type="number" id="recursion-input" class="input-field" value="5" min="1" max="10">
+                    </div>
+                    
+                    <button id="visualize-recursion-btn" class="btn">Visualize</button>
+                    
+                    <div class="result-container">
+                        <div class="code-block" id="recursion-code"></div>
+                        <div class="recursion-tree" id="recursion-tree"></div>
+                    </div>
+                </div>
+
+                <!-- Sorting Algorithms Tab -->
+                <div id="sorting" class="tab-content">
+                    <div class="info-box">
+                        <p>Watch different sorting algorithms in action with customizable array sizes and speeds.</p>
+                    </div>
+                    
+                    <div class="controls">
+                        <div class="input-group">
+                            <label>Algorithm:</label>
+                            <select id="sort-algorithm" class="input-field">
+                                <option value="bubble">Bubble Sort</option>
+                                <option value="selection">Selection Sort</option>
+                                <option value="insertion">Insertion Sort</option>
+                                <option value="merge">Merge Sort</option>
+                                <option value="quick">Quick Sort</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>Array Size:</label>
+                            <input type="range" id="array-size" class="input-field" min="5" max="50" value="20">
+                        </div>
+                        
+                        <div class="input-group speed-control">
+                            <label>Speed:</label>
+                            <input type="range" id="sort-speed" class="input-field" min="1" max="100" value="50">
+                        </div>
+                    </div>
+                    
+                    <button id="generate-array-btn" class="btn">Generate New Array</button>
+                    <button id="start-sort-btn" class="btn">Start Sorting</button>
+                    
+                    <div class="visualization-container">
+                        <div class="array-container" id="array-container"></div>
+                    </div>
+                    
+                    <div class="result-container">
+                        <h3>Algorithm Details:</h3>
+                        <div id="sort-info"></div>
+                    </div>
+                </div>
+
+                <!-- Neural Network Tab -->
+                <div id="neural" class="tab-content">
+                    <div class="info-box">
+                        <p>Visualize a simple neural network with adjustable weights and biases.</p>
+                    </div>
+                    
+                    <div class="controls">
+                        <div class="input-group">
+                            <label>Network Architecture:</label>
+                            <select id="network-architecture" class="input-field">
+                                <option value="2-3-1">2-3-1 (XOR Network)</option>
+                                <option value="3-4-2">3-4-2 (Complex)</option>
+                                <option value="4-4-3">4-4-3 (Deep)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>Activation Function:</label>
+                            <select id="activation-function" class="input-field">
+                                <option value="sigmoid">Sigmoid</option>
+                                <option value="relu">ReLU</option>
+                                <option value="tanh">Tanh</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="initialize-network-btn" class="btn">Initialize Network</button>
+                    <button id="forward-pass-btn" class="btn">Run Forward Pass</button>
+                    
+                    <div class="visualization-container">
+                        <div class="neural-network" id="neural-network"></div>
+                    </div>
+                    
+                    <div class="result-container">
+                        <h3>Network Details:</h3>
+                        <div id="network-info"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab Switching Logic
+        document.querySelectorAll('.tabs .tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Big-O Calculator Logic
+        let complexityChart = null;
+
+        document.getElementById('analyze-btn').addEventListener('click', () => {
+            const pattern = document.getElementById('algorithm-pattern').value;
+            const code = document.getElementById('code-input').value;
+            
+            // Sample data points for visualization
+            const n = Array.from({length: 10}, (_, i) => i + 1);
+            let complexity;
+            let values;
+            
+            switch(pattern) {
+                case 'constant':
+                    complexity = 'O(1) - Constant Time';
+                    values = n.map(() => 1);
+                    break;
+                case 'linear':
+                    complexity = 'O(n) - Linear Time';
+                    values = n.map(x => x);
+                    break;
+                case 'quadratic':
+                    complexity = 'O(n²) - Quadratic Time';
+                    values = n.map(x => x * x);
+                    break;
+                case 'logarithmic':
+                    complexity = 'O(log n) - Logarithmic Time';
+                    values = n.map(x => Math.log2(x));
+                    break;
+                case 'nlogn':
+                    complexity = 'O(n log n)';
+                    values = n.map(x => x * Math.log2(x));
+                    break;
+                case 'exponential':
+                    complexity = 'O(2ⁿ) - Exponential Time';
+                    values = n.map(x => Math.pow(2, x));
+                    break;
+            }
+            
+            document.getElementById('complexity-result').innerHTML = `
+                <p><strong>Time Complexity:</strong> ${complexity}</p>
+                <p><strong>Space Complexity:</strong> Depends on implementation</p>
+                <div class="code-block">${code || 'Using selected pattern'}</div>
+            `;
+            
+            // Update chart
+            if (complexityChart) {
+                complexityChart.destroy();
+            }
+            
+            const ctx = document.getElementById('complexityChart').getContext('2d');
+            complexityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: n,
+                    datasets: [{
+                        label: complexity,
+                        data: values,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#f8fafc'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#f8fafc'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#f8fafc'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Recursion Visualizer Logic
+        document.getElementById('visualize-recursion-btn').addEventListener('click', () => {
+            const func = document.getElementById('recursive-function').value;
+            const n = parseInt(document.getElementById('recursion-input').value);
+            const tree = document.getElementById('recursion-tree');
+            tree.innerHTML = '';
+            
+            let code = '';
+            switch(func) {
+                case 'fibonacci':
+                    code = `function fibonacci(n) {
+    if (n <= 1) return n;
+    return fibonacci(n-1) + fibonacci(n-2);
+}`;
+                    break;
+                case 'factorial':
+                    code = `function factorial(n) {
+    if (n <= 1) return 1;
+    return n * factorial(n-1);
+}`;
+                    break;
+                case 'power':
+                    code = `function power(base, exp) {
+    if (exp === 0) return 1;
+    return base * power(base, exp-1);
+}`;
+                    break;
+            }
+            
+            document.getElementById('recursion-code').textContent = code;
+            
+            // Create visualization nodes
+            const createNode = (value, level, position) => {
+                const node = document.createElement('div');
+                node.className = 'tree-node';
+                node.textContent = value;
+                node.style.top = `${level * 80}px`;
+                node.style.left = `${position}px`;
+                return node;
+            };
+            
+            // Simple visualization for fibonacci
+            if (func === 'fibonacci') {
+                const visualizeFib = (n, level = 0, position = 300) => {
+                    if (n <= 1) return;
+                    
+                    const node = createNode(`fib(${n})`, level, position);
+                    tree.appendChild(node);
+                    
+                    setTimeout(() => {
+                        visualizeFib(n-1, level+1, position-100);
+                        visualizeFib(n-2, level+1, position+100);
+                    }, level * 500);
+                };
+                
+                visualizeFib(n);
+            }
+        });
+
+        // Sorting Visualizer Logic
+        let sortingArray = [];
+        let sorting = false;
+
+        function generateArray() {
+            const size = parseInt(document.getElementById('array-size').value);
+            sortingArray = Array.from({length: size}, () => Math.random() * 300);
+            displayArray();
+        }
+
+        function displayArray() {
+            const container = document.getElementById('array-container');
+            container.innerHTML = '';
+            
+            sortingArray.forEach(value => {
+                const bar = document.createElement('div');
+                bar.className = 'array-bar';
+                bar.style.height = `${value}px`;
+                container.appendChild(bar);
+            });
+        }
+
+        async function bubbleSort() {
+            const n = sortingArray.length;
+            const delay = 101 - parseInt(document.getElementById('sort-speed').value);
+            
+            for (let i = 0; i < n-1; i++) {
+                for (let j = 0; j < n-i-1; j++) {
+                    if (!sorting) return;
+                    
+                    const bars = document.querySelectorAll('.array-bar');
+                    bars[j].classList.add('active');
+                    bars[j+1].classList.add('active');
+                    
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    
+                    if (sortingArray[j] > sortingArray[j+1]) {
+                        // Swap
+                        [sortingArray[j], sortingArray[j+1]] = [sortingArray[j+1], sortingArray[j]];
+                        displayArray();
+                    }
+                    
+                    bars[j].classList.remove('active');
+                    bars[j+1].classList.remove('active');
+                }
+            }
+        }
+
+        document.getElementById('generate-array-btn').addEventListener('click', generateArray);
+        document.getElementById('start-sort-btn').addEventListener('click', async () => {
+            if (sorting) {
+                sorting = false;
+                document.getElementById('start-sort-btn').textContent = 'Start Sorting';
+                return;
+            }
+            
+            sorting = true;
+            document.getElementById('start-sort-btn').textContent = 'Stop Sorting';
+            
+            const algorithm = document.getElementById('sort-algorithm').value;
+            switch(algorithm) {
+                case 'bubble':
+                    await bubbleSort();
+                    break;
+                // Add other sorting algorithms
+            }
+            
+            sorting = false;
+            document.getElementById('start-sort-btn').textContent = 'Start Sorting';
+        });
+
+        // Neural Network Visualizer Logic
+        function createNeuralNetwork() {
+            const container = document.getElementById('neural-network');
+            container.innerHTML = '';
+            
+            const architecture = document.getElementById('network-architecture').value;
+            const layers = architecture.split('-').map(Number);
+            
+            layers.forEach((neurons, layerIndex) => {
+                const layer = document.createElement('div');
+                layer.className = 'layer';
+                
+                for (let i = 0; i < neurons; i++) {
+                    const neuron = document.createElement('div');
+                    neuron.className = 'neuron';
+                    neuron.textContent = layerIndex === 0 ? `x${i+1}` : 
+                                       layerIndex === layers.length-1 ? `y${i+1}` : `h${i+1}`;
+                    layer.appendChild(neuron);
+                    
+                    // Draw connections to next layer
+                    if (layerIndex < layers.length-1) {
+                        const nextLayerNeurons = layers[layerIndex+1];
+                        for (let j = 0; j < nextLayerNeurons; j++) {
+                            const connection = document.createElement('div');
+                            connection.className = 'connection';
+                            connection.style.width = '100px';
+                            connection.style.transform = 'rotate(30deg)';
+                            neuron.appendChild(connection);
+                        }
+                    }
+                }
+                
+                container.appendChild(layer);
+            });
+        }
+
+        document.getElementById('initialize-network-btn').addEventListener('click', createNeuralNetwork);
+        document.getElementById('forward-pass-btn').addEventListener('click', () => {
+            // Animate forward pass
+            const connections = document.querySelectorAll('.connection');
+            connections.forEach((conn, i) => {
+                setTimeout(() => {
+                    conn.classList.add('active');
+                    setTimeout(() => conn.classList.remove('active'), 500);
+                }, i * 100);
+            });
+        });
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            generateArray();
+            createNeuralNetwork();
+            document.getElementById('analyze-btn').click();
+        });
+    </script>
+</body>
+</html> 

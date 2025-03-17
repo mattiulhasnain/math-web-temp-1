@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Tables - CalcHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --text-light: #f8fafc;
+            --text-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(45deg, #0f172a, #1e1b4b);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.3);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 100px auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .table-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .table-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .table-content {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+
+        td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-field {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .tables-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <h1 class="section-title">Mathematical Tables</h1>
+
+        <div class="tables-grid">
+            <!-- Multiplication Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Multiplication Table</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('mult')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="multNumber" class="input-field" value="1" min="1">
+                    <button class="generate-btn" onclick="generateMultTable()">Generate</button>
+                </div>
+                <div class="table-content" id="multTable"></div>
+            </div>
+
+            <!-- Square Numbers -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Square Numbers</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('square')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="squareRange" class="input-field" value="10" min="1">
+                    <button class="generate-btn" onclick="generateSquareTable()">Generate</button>
+                </div>
+                <div class="table-content" id="squareTable"></div>
+            </div>
+
+            <!-- Cube Numbers -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Cube Numbers</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('cube')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="cubeRange" class="input-field" value="10" min="1">
+                    <button class="generate-btn" onclick="generateCubeTable()">Generate</button>
+                </div>
+                <div class="table-content" id="cubeTable"></div>
+            </div>
+
+            <!-- Trigonometric Values -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Trigonometric Values</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('trig')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-content" id="trigTable"></div>
+            </div>
+
+            <!-- Logarithm Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Logarithm Table</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('log')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="logRange" class="input-field" value="10" min="1">
+                    <button class="generate-btn" onclick="generateLogTable()">Generate</button>
+                </div>
+                <div class="table-content" id="logTable"></div>
+            </div>
+
+            <!-- Fibonacci Sequence -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Fibonacci Sequence</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('fib')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="fibRange" class="input-field" value="10" min="1">
+                    <button class="generate-btn" onclick="generateFibTable()">Generate</button>
+                </div>
+                <div class="table-content" id="fibTable"></div>
+            </div>
+
+            <!-- Prime Numbers -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Prime Numbers</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('prime')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="primeRange" class="input-field" value="100" min="1">
+                    <button class="generate-btn" onclick="generatePrimeTable()">Generate</button>
+                </div>
+                <div class="table-content" id="primeTable"></div>
+            </div>
+
+            <!-- Roman Numerals -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Roman Numerals</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('roman')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="romanRange" class="input-field" value="20" min="1">
+                    <button class="generate-btn" onclick="generateRomanTable()">Generate</button>
+                </div>
+                <div class="table-content" id="romanTable"></div>
+            </div>
+
+            <!-- Powers Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Powers Table</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('power')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="powerBase" class="input-field" value="2" min="1" placeholder="Base">
+                    <input type="number" id="powerRange" class="input-field" value="10" min="1" placeholder="Max Power">
+                    <button class="generate-btn" onclick="generatePowerTable()">Generate</button>
+                </div>
+                <div class="table-content" id="powerTable"></div>
+            </div>
+
+            <!-- Physics Constants -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Physics Constants</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('physics')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-content" id="physicsTable"></div>
+            </div>
+
+            <!-- Chemistry Constants -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Chemistry Constants</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('chemistry')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-content" id="chemistryTable"></div>
+            </div>
+
+            <!-- Biology Constants -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Biology Constants</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('biology')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-content" id="biologyTable"></div>
+            </div>
+
+            <!-- Mathematical Constants -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Mathematical Constants</h2>
+                    <div class="table-controls">
+                        <button class="control-btn" onclick="printTable('mathConst')">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-content" id="mathConstTable"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility functions
+        function createTable(headers, rows) {
+            return `
+                <table>
+                    <thead>
+                        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(row => `
+                            <tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function printTable(tableId) {
+            const content = document.getElementById(tableId + 'Table').innerHTML;
+            const win = window.open('', '', 'height=700,width=700');
+            win.document.write('<html><head><title>Print Table</title>');
+            win.document.write('<style>table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px;text-align:center}</style>');
+            win.document.write('</head><body>');
+            win.document.write(content);
+            win.document.write('</body></html>');
+            win.document.close();
+            win.print();
+        }
+
+        // Table generation functions
+        function generateMultTable() {
+            const num = parseInt(document.getElementById('multNumber').value);
+            const headers = ['×', ...Array(10).fill(0).map((_, i) => i + 1)];
+            const rows = [[num]];
+            for (let i = 1; i <= 10; i++) {
+                rows[0].push(num * i);
+            }
+            document.getElementById('multTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generateSquareTable() {
+            const range = parseInt(document.getElementById('squareRange').value);
+            const headers = ['Number', 'Square'];
+            const rows = Array(range).fill(0).map((_, i) => [i + 1, (i + 1) * (i + 1)]);
+            document.getElementById('squareTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generateCubeTable() {
+            const range = parseInt(document.getElementById('cubeRange').value);
+            const headers = ['Number', 'Cube'];
+            const rows = Array(range).fill(0).map((_, i) => [i + 1, Math.pow(i + 1, 3)]);
+            document.getElementById('cubeTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generateTrigTable() {
+            const angles = [0, 30, 45, 60, 90];
+            const headers = ['Angle', 'sin', 'cos', 'tan'];
+            const rows = angles.map(angle => {
+                const rad = angle * Math.PI / 180;
+                return [
+                    angle + '°',
+                    Math.sin(rad).toFixed(3),
+                    Math.cos(rad).toFixed(3),
+                    angle === 90 ? '∞' : Math.tan(rad).toFixed(3)
+                ];
+            });
+            document.getElementById('trigTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generateLogTable() {
+            const range = parseInt(document.getElementById('logRange').value);
+            const headers = ['Number', 'log₁₀', 'ln'];
+            const rows = Array(range).fill(0).map((_, i) => {
+                const num = i + 1;
+                return [num, Math.log10(num).toFixed(4), Math.log(num).toFixed(4)];
+            });
+            document.getElementById('logTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generateFibTable() {
+            const range = parseInt(document.getElementById('fibRange').value);
+            const headers = ['Index', 'Fibonacci Number'];
+            const fib = [0, 1];
+            for (let i = 2; i < range; i++) {
+                fib[i] = fib[i-1] + fib[i-2];
+            }
+            const rows = fib.map((num, i) => [i + 1, num]);
+            document.getElementById('fibTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generatePrimeTable() {
+            const range = parseInt(document.getElementById('primeRange').value);
+            const headers = ['Prime Numbers'];
+            const isPrime = num => {
+                for (let i = 2; i <= Math.sqrt(num); i++) {
+                    if (num % i === 0) return false;
+                }
+                return num > 1;
+            };
+            const primes = Array(range).fill(0)
+                .map((_, i) => i + 1)
+                .filter(isPrime);
+            const rows = primes.map(num => [num]);
+            document.getElementById('primeTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generateRomanTable() {
+            const range = parseInt(document.getElementById('romanRange').value);
+            const headers = ['Number', 'Roman Numeral'];
+            const toRoman = num => {
+                const roman = {
+                    M: 1000, CM: 900, D: 500, CD: 400,
+                    C: 100, XC: 90, L: 50, XL: 40,
+                    X: 10, IX: 9, V: 5, IV: 4, I: 1
+                };
+                let str = '';
+                for (let i of Object.keys(roman)) {
+                    const q = Math.floor(num / roman[i]);
+                    num -= q * roman[i];
+                    str += i.repeat(q);
+                }
+                return str;
+            };
+            const rows = Array(range).fill(0)
+                .map((_, i) => [i + 1, toRoman(i + 1)]);
+            document.getElementById('romanTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generatePowerTable() {
+            const base = parseInt(document.getElementById('powerBase').value);
+            const range = parseInt(document.getElementById('powerRange').value);
+            const headers = ['Power', `${base}ⁿ`];
+            const rows = Array(range).fill(0)
+                .map((_, i) => [i + 1, Math.pow(base, i + 1)]);
+            document.getElementById('powerTable').innerHTML = createTable(headers, rows);
+        }
+
+        function generatePhysicsTable() {
+            const headers = ['Constant', 'Symbol', 'Value', 'Unit'];
+            const constants = [
+                ['Speed of Light in Vacuum', 'c', '2.998 × 10⁸', 'm/s'],
+                ['Planck Constant', 'h', '6.626 × 10⁻³⁴', 'J·s'],
+                ['Gravitational Constant', 'G', '6.674 × 10⁻¹¹', 'N·m²/kg²'],
+                ['Elementary Charge', 'e', '1.602 × 10⁻¹⁹', 'C'],
+                ['Electron Mass', 'mₑ', '9.109 × 10⁻³¹', 'kg'],
+                ['Proton Mass', 'mₚ', '1.673 × 10⁻²⁷', 'kg'],
+                ['Neutron Mass', 'mₙ', '1.675 × 10⁻²⁷', 'kg'],
+                ['Boltzmann Constant', 'k', '1.381 × 10⁻²³', 'J/K'],
+                ['Avogadro Constant', 'Nₐ', '6.022 × 10²³', 'mol⁻¹'],
+                ['Vacuum Permittivity', 'ε₀', '8.854 × 10⁻¹²', 'F/m']
+            ];
+            document.getElementById('physicsTable').innerHTML = createTable(headers, constants);
+        }
+
+        function generateChemistryTable() {
+            const headers = ['Constant', 'Symbol', 'Value', 'Unit'];
+            const constants = [
+                ['Gas Constant', 'R', '8.314', 'J/(mol·K)'],
+                ['Faraday Constant', 'F', '96,485', 'C/mol'],
+                ['Standard Pressure', 'P₀', '101,325', 'Pa'],
+                ['Standard Temperature', 'T₀', '273.15', 'K'],
+                ['Molar Volume (STP)', 'Vₘ', '22.414', 'L/mol'],
+                ['pH of Pure Water', 'pH', '7.0', ''],
+                ['Atomic Mass Unit', 'u', '1.661 × 10⁻²⁷', 'kg'],
+                ['Standard Gravity', 'g', '9.807', 'm/s²'],
+                ['Electron Affinity of F', 'EA(F)', '-328', 'kJ/mol'],
+                ['First Ionization Energy of H', 'IE(H)', '1312', 'kJ/mol']
+            ];
+            document.getElementById('chemistryTable').innerHTML = createTable(headers, constants);
+        }
+
+        function generateBiologyTable() {
+            const headers = ['Constant', 'Value', 'Unit'];
+            const constants = [
+                ['Average Human Body Temperature', '37', '°C'],
+                ['Normal Blood pH', '7.35-7.45', ''],
+                ['Resting Heart Rate', '60-100', 'beats/min'],
+                ['Normal Blood Pressure', '120/80', 'mmHg'],
+                ['Respiratory Rate', '12-20', 'breaths/min'],
+                ['Blood Glucose (Fasting)', '70-100', 'mg/dL'],
+                ['DNA Double Helix Diameter', '2', 'nm'],
+                ['ATP Energy', '7.3', 'kcal/mol'],
+                ['Cell Membrane Thickness', '7-9', 'nm'],
+                ['Neuron Action Potential', '-70', 'mV']
+            ];
+            document.getElementById('biologyTable').innerHTML = createTable(headers, constants);
+        }
+
+        function generateMathConstTable() {
+            const headers = ['Constant', 'Symbol', 'Value'];
+            const constants = [
+                ['Pi', 'π', '3.141592653589793...'],
+                ['Euler\'s Number', 'e', '2.718281828459045...'],
+                ['Golden Ratio', 'φ', '1.618033988749895...'],
+                ['Square Root of 2', '√2', '1.414213562373095...'],
+                ['Square Root of 3', '√3', '1.732050807568877...'],
+                ['Natural Log of 2', 'ln(2)', '0.693147180559945...'],
+                ['Natural Log of 10', 'ln(10)', '2.302585092994046...'],
+                ['Euler-Mascheroni Constant', 'γ', '0.577215664901533...'],
+                ['Apéry\'s Constant', 'ζ(3)', '1.202056903159594...'],
+                ['Catalan\'s Constant', 'G', '0.915965594177219...']
+            ];
+            document.getElementById('mathConstTable').innerHTML = createTable(headers, constants);
+        }
+
+        // Initialize all tables
+        window.onload = () => {
+            generateMultTable();
+            generateSquareTable();
+            generateCubeTable();
+            generateTrigTable();
+            generateLogTable();
+            generateFibTable();
+            generatePrimeTable();
+            generateRomanTable();
+            generatePowerTable();
+            generatePhysicsTable();
+            generateChemistryTable();
+            generateBiologyTable();
+            generateMathConstTable();
+        };
+    </script>
+</body>
+</html> 

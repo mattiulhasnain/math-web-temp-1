@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime Numbers & Factorization - CalcHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --text-light: #f8fafc;
+            --text-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(45deg, #0f172a, #1e1b4b);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Divine Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.3);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--glass-bg);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: -1;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover::before {
+            transform: translateY(0);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Tool Sections */
+        .tools-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .tool-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .tool-section:hover {
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .section-icon {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .no-result {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: var(--glass-bg);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tools-container {
+                grid-template-columns: 1fr;
+            }
+
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Divine Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                CalcHub
+            </a>
+            <div class="nav-links">
+                <a href="calculator.html" class="nav-link">Calculator</a>
+                <a href="scientific-calculator.html" class="nav-link">Scientific</a>
+                <a href="graphing.html" class="nav-link">Graphing</a>
+                <a href="index.html#tools" class="nav-link">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="title-section">
+            <h1 class="title">Prime Numbers & Factorization</h1>
+            <p class="subtitle">Generate prime numbers, factorize numbers, and compute GCD/LCM with divine precision</p>
+        </div>
+
+        <div class="tools-container">
+            <!-- Prime Number Generator -->
+            <div class="tool-section">
+                <div class="section-header">
+                    <i class="fas fa-list-ol section-icon"></i>
+                    <h2 class="section-title">Prime Number Generator</h2>
+                </div>
+                <div class="input-group">
+                    <label for="prime-start">Start Number:</label>
+                    <input type="number" id="prime-start" class="input-field" value="1" min="1">
+                </div>
+                <div class="input-group">
+                    <label for="prime-end">End Number:</label>
+                    <input type="number" id="prime-end" class="input-field" value="100" min="2">
+                </div>
+                <button id="generate-primes" class="btn">
+                    <i class="fas fa-play"></i>
+                    Generate Primes
+                </button>
+                <div class="result">
+                    <h3 class="result-title">Prime Numbers</h3>
+                    <div id="prime-result" class="no-result">Results will appear here</div>
+                </div>
+            </div>
+
+            <!-- Prime Factorization -->
+            <div class="tool-section">
+                <div class="section-header">
+                    <i class="fas fa-subscript section-icon"></i>
+                    <h2 class="section-title">Prime Factorization</h2>
+                </div>
+                <div class="input-group">
+                    <label for="factorize-number">Number to Factorize:</label>
+                    <input type="number" id="factorize-number" class="input-field" value="60" min="2">
+                </div>
+                <button id="factorize" class="btn">
+                    <i class="fas fa-project-diagram"></i>
+                    Factorize
+                </button>
+                <div class="result">
+                    <h3 class="result-title">Prime Factors</h3>
+                    <div id="factorization-result" class="no-result">Results will appear here</div>
+                </div>
+            </div>
+
+            <!-- GCD and LCM Calculator -->
+            <div class="tool-section">
+                <div class="section-header">
+                    <i class="fas fa-divide section-icon"></i>
+                    <h2 class="section-title">GCD & LCM Calculator</h2>
+                </div>
+                <div class="input-group">
+                    <label for="gcd-numbers">Enter Numbers (comma separated):</label>
+                    <input type="text" id="gcd-numbers" class="input-field" value="24, 36, 48" placeholder="e.g., 24, 36, 48">
+                </div>
+                <button id="calculate-gcd-lcm" class="btn">
+                    <i class="fas fa-calculator"></i>
+                    Calculate
+                </button>
+                <div class="result">
+                    <h3 class="result-title">Results</h3>
+                    <div id="gcd-lcm-result" class="no-result">Results will appear here</div>
+                </div>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+    </div>
+
+    <script>
+        // Prime Number Generator
+        document.getElementById('generate-primes').addEventListener('click', function() {
+            const start = parseInt(document.getElementById('prime-start').value);
+            const end = parseInt(document.getElementById('prime-end').value);
+            
+            if (isNaN(start) || isNaN(end) || start < 1 || end < 2 || start > end) {
+                alert('Please enter valid numbers. Start should be ≥ 1 and End should be ≥ 2.');
+                return;
+            }
+            
+            if (end - start > 10000) {
+                if (!confirm('Generating primes in a large range might take some time. Continue?')) {
+                    return;
+                }
+            }
+            
+            const primes = generatePrimes(start, end);
+            const resultDiv = document.getElementById('prime-result');
+            
+            if (primes.length === 0) {
+                resultDiv.innerHTML = `<div class="no-result">No prime numbers found in the range ${start}-${end}</div>`;
+            } else {
+                resultDiv.innerHTML = '';
+                let html = `<div class="result-item">Found ${primes.length} prime numbers:</div>`;
+                
+                // Split primes into chunks for better display
+                const chunks = [];
+                for (let i = 0; i < primes.length; i += 10) {
+                    chunks.push(primes.slice(i, i + 10).join(', '));
+                }
+                
+                chunks.forEach(chunk => {
+                    html += `<div class="result-item">${chunk}</div>`;
+                });
+                
+                resultDiv.innerHTML = html;
+            }
+        });
+        
+        // Prime Factorization
+        document.getElementById('factorize').addEventListener('click', function() {
+            const number = parseInt(document.getElementById('factorize-number').value);
+            
+            if (isNaN(number) || number < 2) {
+                alert('Please enter a valid number ≥ 2');
+                return;
+            }
+            
+            const factors = primeFactorize(number);
+            const resultDiv = document.getElementById('factorization-result');
+            
+            if (factors.length === 0) {
+                resultDiv.innerHTML = `<div class="no-result">Could not factorize ${number}</div>`;
+            } else {
+                // Create the factorization representation
+                let factorization = '';
+                const groups = {};
+                
+                factors.forEach(factor => {
+                    groups[factor] = (groups[factor] || 0) + 1;
+                });
+                
+                const terms = [];
+                for (const [prime, power] of Object.entries(groups)) {
+                    terms.push(power === 1 ? prime : `${prime}<sup>${power}</sup>`);
+                }
+                
+                factorization = terms.join(' × ');
+                
+                resultDiv.innerHTML = `
+                    <div class="result-item">Number: ${number}</div>
+                    <div class="result-item">Prime factors: ${factors.join(' × ')}</div>
+                    <div class="result-item">Factorization: ${factorization}</div>
+                `;
+            }
+        });
+        
+        // GCD and LCM Calculator
+        document.getElementById('calculate-gcd-lcm').addEventListener('click', function() {
+            const input = document.getElementById('gcd-numbers').value;
+            const numberStrings = input.split(',').map(s => s.trim());
+            const numbers = [];
+            
+            for (const numStr of numberStrings) {
+                const num = parseInt(numStr);
+                if (isNaN(num) || num < 1) {
+                    alert('Please enter valid numbers separated by commas (all numbers must be ≥ 1)');
+                    return;
+                }
+                numbers.push(num);
+            }
+            
+            if (numbers.length < 2) {
+                alert('Please enter at least two numbers to calculate GCD and LCM');
+                return;
+            }
+            
+            // Calculate GCD and LCM for the list of numbers
+            let currentGcd = numbers[0];
+            let currentLcm = numbers[0];
+            
+            for (let i = 1; i < numbers.length; i++) {
+                currentGcd = calculateGcd(currentGcd, numbers[i]);
+                currentLcm = calculateLcm(currentLcm, numbers[i]);
+            }
+            
+            const resultDiv = document.getElementById('gcd-lcm-result');
+            resultDiv.innerHTML = `
+                <div class="result-item">Numbers: ${numbers.join(', ')}</div>
+                <div class="result-item">GCD (Greatest Common Divisor): ${currentGcd}</div>
+                <div class="result-item">LCM (Least Common Multiple): ${currentLcm}</div>
+            `;
+        });
+        
+        // Helper Functions
+        
+        // Check if a number is prime (simple method)
+        function isPrime(num) {
+            if (num <= 1) return false;
+            if (num <= 3) return true;
+            if (num % 2 === 0 || num % 3 === 0) return false;
+            
+            for (let i = 5; i * i <= num; i += 6) {
+                if (num % i === 0 || num % (i + 2) === 0) return false;
+            }
+            
+            return true;
+        }
+        
+        // Generate primes in a range
+        function generatePrimes(start, end) {
+            const primes = [];
+            
+            // Optimize by implementing a simple Sieve of Eratosthenes
+            if (end <= 10000) {
+                const sieve = new Array(end + 1).fill(true);
+                sieve[0] = sieve[1] = false;
+                
+                for (let i = 2; i * i <= end; i++) {
+                    if (sieve[i]) {
+                        for (let j = i * i; j <= end; j += i) {
+                            sieve[j] = false;
+                        }
+                    }
+                }
+                
+                for (let i = Math.max(2, start); i <= end; i++) {
+                    if (sieve[i]) {
+                        primes.push(i);
+                    }
+                }
+            } else {
+                // For larger ranges, use direct checking
+                for (let i = Math.max(2, start); i <= end; i++) {
+                    if (isPrime(i)) {
+                        primes.push(i);
+                    }
+                }
+            }
+            
+            return primes;
+        }
+        
+        // Prime factorization of a number
+        function primeFactorize(num) {
+            const factors = [];
+            let n = num;
+            
+            // Handle factors of 2 specially
+            while (n % 2 === 0) {
+                factors.push(2);
+                n /= 2;
+            }
+            
+            // Check for other factors
+            for (let i = 3; i * i <= n; i += 2) {
+                while (n % i === 0) {
+                    factors.push(i);
+                    n /= i;
+                }
+            }
+            
+            // If n is a prime number greater than 2
+            if (n > 2) {
+                factors.push(n);
+            }
+            
+            return factors;
+        }
+        
+        // Calculate Greatest Common Divisor (GCD)
+        function calculateGcd(a, b) {
+            while (b) {
+                const temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+        
+        // Calculate Least Common Multiple (LCM)
+        function calculateLcm(a, b) {
+            return (a * b) / calculateGcd(a, b);
+        }
+    </script>
+</body>
+</html> 
